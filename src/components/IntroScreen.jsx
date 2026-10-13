@@ -17,6 +17,6 @@ export default function IntroScreen({ visible, onEnter, onAccessible }) {
         <button className="text-button" onClick={onAccessible}>Open accessible portfolio</button>
       </div>
     </section>
-    <div className="entry-help"><span>WASD / ARROWS TO MOVE</span><span>MOUSE TO LOOK</span><span>CLICK TERMINALS TO INSPECT</span></div>
+    <div className="entry-help"><span>2-FINGER TOUCHPAD SWIPE TO MOVE</span><span>1 FINGER TO POINT & CLICK</span><span>WASD / ARROWS ALSO WORK</span></div>
   </main>;
 }
