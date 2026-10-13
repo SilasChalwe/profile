@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr, Preload } from '@react-three/drei';
 import { portfolio, worldZones } from './content.js';
 import { portfolioAudio } from './lib/audio.js';
+import { readSession, saveSession } from './lib/session.js';
 import World from './components/World.jsx';
 import IntroScreen from './components/IntroScreen.jsx';
 import HUD from './components/HUD.jsx';
@@ -11,26 +12,64 @@ import AccessiblePortfolio from './components/AccessiblePortfolio.jsx';
 
 export default function App() {
   const reduceMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
-  const [entered, setEntered] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [accessible, setAccessible] = useState(reduceMotion);
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [activeZone, setActiveZone] = useState(worldZones[0].id);
+  const saved = useMemo(() => readSession(), []);
+  const accessibleLink = useMemo(() => window.location.hash.startsWith('#accessible-'), []);
+
+  const [entered, setEntered] = useState(() => saved?.entered === true);
+  const [paused, setPaused] = useState(() => saved?.paused === true);
+  const [accessible, setAccessible] = useState(() => accessibleLink || saved?.accessible === true || reduceMotion);
+  const [selectedProject, setSelectedProject] = useState(() =>
+    portfolio.projects.find(item => item.id === saved?.selectedProjectId) || null
+  );
+  const [activeZone, setActiveZone] = useState(() =>
+    worldZones.some(zone => zone.id === saved?.activeZone) ? saved.activeZone : worldZones[0].id
+  );
+
+  // Browsers require a fresh user gesture to restart audio after navigation.
   const [ambient, setAmbient] = useState(false);
-  const [effects, setEffects] = useState(true);
-  const [quality, setQuality] = useState(window.innerWidth < 760 ? 'low' : 'high');
+  const [effects, setEffects] = useState(() => saved?.effects !== false);
+  const [quality, setQuality] = useState(() =>
+    ['low', 'high'].includes(saved?.quality)
+      ? saved.quality
+      : window.innerWidth < 760 ? 'low' : 'high'
+  );
+
+  useEffect(() => {
+    portfolioAudio.effectsEnabled = effects;
+  }, [effects]);
+
+  useEffect(() => {
+    saveSession({
+      entered, paused, accessible, activeZone,
+      selectedProjectId: selectedProject?.id || null,
+      effects, quality
+    });
+  }, [entered, paused, accessible, activeZone, selectedProject, effects, quality]);
+
+  // Refreshing a bookmarked accessible section should restore that section.
+  useEffect(() => {
+    if (!accessible) return;
+    const id = window.location.hash.slice(1);
+    if (!id.startsWith('accessible-')) return;
+    const frame = requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [accessible]);
 
   useEffect(() => {
     const onKey = event => {
-      if (event.key === 'Escape' && entered && !selectedProject) setPaused(value => !value);
-      if (event.key.toLowerCase() === 'p' && entered && !selectedProject) setPaused(value => !value);
+      if (!entered || accessible || selectedProject ||
+          event.target?.closest?.('input,select,textarea,[contenteditable="true"]')) return;
+      if (event.key === 'Escape' || event.key.toLowerCase() === 'p') {
+        setPaused(value => !value);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [entered, selectedProject]);
+  }, [entered, accessible, selectedProject]);
 
   const enterWorld = withSound => {
     setEntered(true);
+    setPaused(false);
     setAmbient(withSound);
     if (withSound) portfolioAudio.setAmbient(true);
     portfolioAudio.effectsEnabled = effects;
@@ -56,7 +95,20 @@ export default function App() {
   };
 
   const toggleAmbient = value => { setAmbient(value); portfolioAudio.setAmbient(value); };
-  const toggleEffects = value => { setEffects(value); portfolioAudio.effectsEnabled = value; if (value) portfolioAudio.play('select'); };
+  const toggleEffects = value => {
+    setEffects(value);
+    portfolioAudio.effectsEnabled = value;
+    if (value) portfolioAudio.play('select');
+  };
+
+  const returnToWorld = () => {
+    if (window.location.hash.startsWith('#accessible-')) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    setAccessible(false);
+    setEntered(true);
+    setPaused(false);
+  };
 
   return <div className="app-shell">
     <IntroScreen visible={!entered && !accessible} onEnter={enterWorld} onAccessible={() => setAccessible(true)} />
@@ -68,7 +120,8 @@ export default function App() {
         gl={{ antialias: quality === 'high', powerPreference: 'high-performance', alpha: false }}
         onCreated={({ gl }) => { gl.domElement.setAttribute('aria-label', 'Interactive 3D portfolio world'); }}
       >
-        <World paused={paused || !entered} quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} />
+        <World paused={paused || !entered || accessible || Boolean(selectedProject)}
+          quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} />
         <AdaptiveDpr pixelated />
         <Preload all />
       </Canvas>
@@ -83,11 +136,14 @@ export default function App() {
         setEffects={toggleEffects}
         quality={quality}
         setQuality={setQuality}
-        onAccessible={() => { setAccessible(true); document.exitPointerLock?.(); }}
+        onAccessible={() => { setAccessible(true); setPaused(false); document.exitPointerLock?.(); }}
       />
     </div>
 
-    {selectedProject && <ProjectPanel project={selectedProject} onClose={() => { setSelectedProject(null); setPaused(false); }} />}
-    {accessible && <AccessiblePortfolio onWorld={() => { setAccessible(false); setEntered(true); }} onProject={project => setSelectedProject(project)} />}
+    {selectedProject && <ProjectPanel project={selectedProject} onClose={() => {
+      setSelectedProject(null);
+      setPaused(false);
+    }} />}
+    {accessible && <AccessiblePortfolio onWorld={returnToWorld} onProject={project => openProject(project.id)} />}
   </div>;
 }
