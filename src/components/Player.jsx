@@ -19,6 +19,7 @@ export default function Player({ paused, onZone }) {
   const travel = useRef(null);
   const touch = useRef({ x: 0, y: 0 });
   const touchLook = useRef(null);
+  const dragging = useRef(false);
 
   const persistPose = () => {
     saveSession({
@@ -42,13 +43,14 @@ export default function Player({ paused, onZone }) {
     const down = event => { keys.current[event.code] = true; };
     const up = event => { keys.current[event.code] = false; };
     const look = event => {
-      if (document.pointerLockElement !== gl.domElement || paused) return;
-      yaw.current -= event.movementX * .0018;
-      pitch.current = THREE.MathUtils.clamp(pitch.current - event.movementY * .0015, -.72, .55);
+      if (paused || (document.pointerLockElement !== gl.domElement && !dragging.current)) return;
+      yaw.current -= event.movementX * .0024;
+      pitch.current = THREE.MathUtils.clamp(pitch.current - event.movementY * .002, -.72, .55);
     };
-    const click = event => {
-      if (!paused && event.pointerType !== 'touch' && event.target === gl.domElement && document.pointerLockElement !== gl.domElement) gl.domElement.requestPointerLock?.();
+    const startDrag = event => {
+      if (!paused && event.pointerType === 'mouse' && event.button === 0) dragging.current = true;
     };
+    const endDrag = () => { dragging.current = false; };
     const touchStart = event => {
       if (event.pointerType === 'touch' && event.clientX > window.innerWidth * .42) touchLook.current = { x:event.clientX, y:event.clientY, id:event.pointerId };
     };
@@ -59,7 +61,15 @@ export default function Player({ paused, onZone }) {
       touchLook.current = { x:event.clientX, y:event.clientY, id:event.pointerId };
     };
     const touchEnd = event => { if (touchLook.current?.id === event.pointerId) touchLook.current = null; };
-    const travelHandler = event => { travel.current = new THREE.Vector3(event.detail.position[0], 2.2, event.detail.position[2] + 7); };
+    const travelHandler = event => {
+      const { position, home } = event.detail;
+      travel.current = new THREE.Vector3(home ? 0 : position[0], 2.2, home ? 8 : position[2] + 7);
+      yaw.current = 0;
+      pitch.current = -.08;
+      keys.current = {};
+      touch.current = { x: 0, y: 0 };
+      dragging.current = false;
+    };
     const touchHandler = event => { touch.current = event.detail; };
     const persistOnExit = () => {
       saveSession({ pose: {
@@ -68,14 +78,20 @@ export default function Player({ paused, onZone }) {
       } });
     };
     window.addEventListener('keydown', down); window.addEventListener('keyup', up);
-    document.addEventListener('mousemove', look); gl.domElement.addEventListener('click', click);
+    document.addEventListener('mousemove', look);
+    gl.domElement.addEventListener('pointerdown', startDrag);
+    document.addEventListener('pointerup', endDrag);
+    window.addEventListener('blur', endDrag);
     gl.domElement.addEventListener('pointerdown', touchStart); gl.domElement.addEventListener('pointermove', touchMove); gl.domElement.addEventListener('pointerup', touchEnd);
     window.addEventListener('portfolio:travel', travelHandler);
     window.addEventListener('portfolio:move', touchHandler);
     window.addEventListener('pagehide', persistOnExit);
     return () => {
       window.removeEventListener('keydown', down); window.removeEventListener('keyup', up);
-      document.removeEventListener('mousemove', look); gl.domElement.removeEventListener('click', click);
+      document.removeEventListener('mousemove', look);
+      gl.domElement.removeEventListener('pointerdown', startDrag);
+      document.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('blur', endDrag);
       gl.domElement.removeEventListener('pointerdown', touchStart); gl.domElement.removeEventListener('pointermove', touchMove); gl.domElement.removeEventListener('pointerup', touchEnd);
       window.removeEventListener('portfolio:travel', travelHandler);
       window.removeEventListener('portfolio:move', touchHandler);
