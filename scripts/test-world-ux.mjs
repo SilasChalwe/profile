@@ -14,20 +14,24 @@ const app = read('src/App.jsx');
 const hud = read('src/components/HUD.jsx');
 const css = read('src/styles.css');
 
-assert.match(world, /args=\{\['#f8fbff'\]\}/, '3D background must be white-first');
+assert.match(world, /args=\{\['#ffffff'\]\}/, '3D background must be white-first');
 assert.match(world, /color="#ffffff"/, 'original world structures must use light materials');
 assert.match(world, /function CentralPlaza/, 'original central plaza must remain');
 assert.match(world, /function Paths/, 'original walking paths must remain');
 assert.match(zone, /<Billboard follow lockX lockZ/, 'labels must face the player');
 assert.match(terminal, /<Billboard follow lockX lockZ/, 'project exhibits must face the player');
-assert.match(hud, /Explore Areas/, 'direct section navigation must be discoverable');
+assert.match(hud, /Explore areas/i, 'direct section navigation must be discoverable');
 assert.match(hud, /⌂ Start/, 'visitors need a visible return-to-start action');
-assert.match(hud, /How to explore/, 'first-time visitors need instructions');
-assert.match(hud, /Switch to standard, non-3D portfolio/, 'visitors need a non-game alternative');
+assert.match(hud, /2 FINGERS/, 'first-time visitors need instructions');
+assert.match(hud, /Switch to standard portfolio view/, 'visitors need a non-game alternative');
 assert.match(app, /onHome=\{\(\) => travel\('plaza'\)\}/, 'home navigation must be connected');
-assert.match(player, /const startDrag/, 'drag look should not require pointer lock');
+assert.match(player, /addEventListener\('wheel', wheel, \{ passive: false \}\)/, 'two-finger scrolling must be handled on the 3D canvas');
+assert.match(player, /event\.preventDefault\(\)/, 'browser scrolling must not steal 3D navigation');
+assert.match(player, /event\.deltaX/, 'two-finger sideways swipe must work');
+assert.match(player, /event\.deltaY/, 'two-finger vertical swipe must work');
+assert.doesNotMatch(player, /pointerType === 'mouse'/, 'one-finger cursor input must never move camera');
 assert.doesNotMatch(player, /requestPointerLock/, 'the cursor must remain freely usable');
-assert.match(css, /WHITE-WORLD AND ACCESSIBLE NAVIGATION/, 'white navigation theme is required');
+assert.match(css, /COLOR-ONLY REFINEMENT OF THE ORIGINAL LAYOUT/, 'white navigation theme is required');
 
 // When teleporting to a zone, spawn on its inward-facing side, looking at the exhibit.
 // This prevents the backwards text / rear-of-pavilion view that was reported.
