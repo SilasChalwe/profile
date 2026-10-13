@@ -1,5 +1,5 @@
-import siteData from './data/site-data.json';
-import mediaManifest from './data/project-media.json';
+import siteData from './data/site-data.json' with { type: 'json' };
+import mediaManifest from './data/project-media.json' with { type: 'json' };
 
 // Data is defined in the two JSON files above. Three.js geometry, routing,
 // labels and galleries are generated from the data, not hand-coded by project.
