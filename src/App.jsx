@@ -18,6 +18,7 @@ export default function App() {
 
   const [entered, setEntered] = useState(() => saved?.entered === true);
   const [paused, setPaused] = useState(() => saved?.paused === true);
+  const [viewMode, setViewMode] = useState(() => ['move','look','bird'].includes(saved?.viewMode) ? saved.viewMode : 'move');
   const [visitedZones, setVisitedZones] = useState(() =>
     Array.isArray(saved?.visitedZones)
       ? saved.visitedZones.filter(id => id === 'plaza' || worldZones.some(zone => zone.id === id)).slice(-20)
@@ -48,11 +49,11 @@ export default function App() {
 
   useEffect(() => {
     saveSession({
-      entered, paused, accessible, activeZone, visitedZones,
+      entered, paused, accessible, activeZone, visitedZones, viewMode,
       selectedProjectId: selectedProject?.id || null,
       effects, quality
     });
-  }, [entered, paused, accessible, activeZone, visitedZones, selectedProject, effects, quality]);
+  }, [entered, paused, accessible, activeZone, visitedZones, viewMode, selectedProject, effects, quality]);
 
   // Refreshing a bookmarked accessible section should restore that section.
   useEffect(() => {
@@ -162,7 +163,7 @@ export default function App() {
         gl={{ antialias: quality === 'high', powerPreference: 'high-performance', alpha: false }}
         onCreated={({ gl }) => { gl.domElement.setAttribute('aria-label', 'Interactive 3D portfolio world'); }}
       >
-        <World paused={paused || !entered || accessible || Boolean(selectedProject)}
+        <World viewMode={viewMode} paused={paused || !entered || accessible || Boolean(selectedProject)}
           quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} onPreview={previewProject} onPreviewLeave={schedulePreviewClose} />
         <AdaptiveDpr pixelated />
         <Preload all />
@@ -171,6 +172,8 @@ export default function App() {
         paused={paused}
         setPaused={setPaused}
         activeZone={activeZone}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
         onTravel={travel}
         onHome={() => travel('plaza')}
         onBack={goBack}
