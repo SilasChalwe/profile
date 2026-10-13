@@ -20,7 +20,7 @@ function TouchControls() {
   return <div className="touch-stick" onPointerDown={update} onPointerMove={event => { if (origin.current) update(event); }} onPointerUp={end} onPointerCancel={end} aria-label="Touch movement control"><i style={{ transform:`translate(${stick.x*28}px,${stick.y*28}px)` }}></i></div>;
 }
 
-export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, onBack, canGoBack, viewMode, setViewMode, ambient, setAmbient, effects, setEffects, quality, setQuality, onAccessible }) {
+export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, onBack, canGoBack, viewMode, setViewMode, tour, onStartTour, onPauseTour, onResumeTour, onStopTour, ambient, setAmbient, effects, setEffects, quality, setQuality, onAccessible }) {
   const [mapOpen, setMapOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const closeMaps = () => { setMapOpen(false); setHelpOpen(false); };
@@ -37,9 +37,10 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
   return <div className="hud">
     <header className="hud-top"><div className="hud-brand"><b>SC</b><span>INTERACTIVE PORTFOLIO</span></div><div className="hud-location"><i></i>{worldZones.find(zone=>zone.id===activeZone)?.label || 'Central plaza'}</div><nav className="hud-actions" aria-label="Portfolio navigation">
       <button type="button" onClick={back} disabled={!canGoBack} aria-label="Go to previous area">← Back</button>
-      <button type="button" onClick={home} aria-label="Go to starting area">⌂ Start</button>
+      <button type="button" onClick={home} aria-label="Go to starting area">⌂ Home</button>
+      <button type="button" onClick={() => {closeMaps();onStartTour();}} title="Play a guided automatic tour of the entire portfolio">▶ Start tour</button>
       <button type="button" onClick={() => {setHelpOpen(v=>!v);setMapOpen(false);}} aria-expanded={helpOpen}>Help</button>
-      <button type="button" onClick={() => {setPaused(true);setHelpOpen(false);setMapOpen(false)}} aria-label="Open settings">Settings</button>
+      <button type="button" onClick={() => {if(tour.status === 'playing')onPauseTour();setPaused(true);setHelpOpen(false);setMapOpen(false)}} aria-label="Open settings">Settings</button>
     </nav></header>
     <section className="camera-controls" aria-label="Camera and viewpoint controls">
       <div className="camera-controls__modes" role="group" aria-label="Choose camera mode">
@@ -73,6 +74,28 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
         <button type="button" onClick={()=>adjustView({topDown:true})}>Top-down</button>
       </div>}
     </section>
+    {(tour.status === 'playing' || tour.status === 'paused' || tour.status === 'complete') && (
+      <section className="tour-player" aria-label="Guided portfolio tour player">
+        <div className="tour-player__info" aria-live="polite">
+          <strong>{tour.status === 'complete' ? '✓ Guided tour complete' : tour.status === 'paused' ? '⏸ Tour paused' : '▶ Guided tour'}</strong>
+          <span>{tour.status === 'complete' ? 'You can explore freely or watch again' :
+            `${tour.phase === 'visiting' ? 'Viewing' : 'Travelling to'}: ${tour.label}`}</span>
+          <small>{tour.status === 'complete' ? 'Finished' : `Area ${tour.index} of ${tour.total}`}</small>
+        </div>
+        <div className="tour-player__actions">
+          {tour.status === 'complete' ? (
+            <button type="button" onClick={onStartTour}>↻ Replay</button>
+          ) : (
+            <>
+              <button type="button" onClick={tour.status === 'paused' ? onResumeTour : onPauseTour}>
+                {tour.status === 'paused' ? '▶ Resume' : '⏸ Pause'}
+              </button>
+              <button type="button" onClick={onStopTour}>■ Stop</button>
+            </>
+          )}
+        </div>
+      </section>
+    )}
     <div className="reticle" aria-hidden="true"><i></i><i></i></div>
     <div className="hud-help">
       <span>1 FINGER: POINT & CLICK</span>
@@ -87,7 +110,7 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
     {helpOpen && <section className="hud-quick-help" aria-label="How to explore">
       <strong>Explore the portfolio</strong>
       <p>Use <b>Move</b> for two-finger walking and strafing. Switch to <b>Look 360°</b> and two-finger swipe to turn behind you or look up and down. <b>Bird's-eye</b> shows the world from above; two fingers pan, and the rotate, zoom and tilt buttons adjust the view.</p><p>A single finger still points and clicks on a laptop touchpad. With a mouse, right-drag rotates in Look mode. Q/E turn, R/F tilt, and WASD or arrow keys move.</p>
-      <p>Or select <b>Explore areas</b> to jump directly to a project zone. You can also use WASD or arrow keys.</p>
+      <p>For an automatic experience, select <b>Start tour</b>. The camera will travel through each exhibition, pause briefly, and return to the plaza. Pause, resume or stop whenever you want. You can still use <b>Explore areas</b> to jump directly to a zone.</p>
       <button type="button" onClick={()=>{setHelpOpen(false);setMapOpen(true)}}>Browse project areas →</button>
     </section>}
     <TouchControls />
