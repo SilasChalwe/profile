@@ -1,0 +1,18 @@
+{
+  "gate": [
+    {
+      "src": "/assets/previews/gate.svg",
+      "alt": "Original Gate brand artwork",
+      "caption": "Original Gate brand artwork — UI screenshots pending",
+      "kind": "branding"
+    }
+  ],
+  "mfocus": [
+    {
+      "src": "/assets/previews/mfocus.svg",
+      "alt": "Original MFocus mobile application screen",
+      "caption": "Original MFocus app screenshot",
+      "kind": "screenshot"
+    }
+  ]
+}
