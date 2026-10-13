@@ -9,18 +9,30 @@ export default function MediaGallery({
   const [index,setIndex]=useState(0);
   const startX=useRef(null);
   const lastWheel=useRef(0);
+  const galleryRef=useRef(null);
   useEffect(()=>setIndex(0),[project?.id]);
   const count=images.length;
   const choose=i=>{if(count)setIndex(((i%count)+count)%count);};
   const step=amount=>choose(index+amount);
-  const onWheel=event=>{
-    if(count<2 || event.ctrlKey)return;
-    const delta=Math.abs(event.deltaX)>Math.abs(event.deltaY)?event.deltaX:event.deltaY;
-    if(Math.abs(delta)<7)return;
-    event.preventDefault();event.stopPropagation();
-    const now=Date.now();
-    if(now-lastWheel.current>250){step(delta>0?1:-1);lastWheel.current=now;}
-  };
+  // Handle trackpad wheel natively (non-passive), so navigating screenshots
+  // does not accidentally walk the 3D player or scroll a modal page.
+  useEffect(()=>{
+    const element=galleryRef.current;
+    if(!element || count<2)return;
+    const onWheel=event=>{
+      if(event.ctrlKey)return;
+      const delta=Math.abs(event.deltaX)>Math.abs(event.deltaY)?event.deltaX:event.deltaY;
+      if(Math.abs(delta)<7)return;
+      event.preventDefault();event.stopPropagation();
+      const now=Date.now();
+      if(now-lastWheel.current>250){
+        setIndex(current=>((current+(delta>0?1:-1))%count+count)%count);
+        lastWheel.current=now;
+      }
+    };
+    element.addEventListener('wheel',onWheel,{passive:false});
+    return ()=>element.removeEventListener('wheel',onWheel);
+  },[count]);
   const onTouchStart=event=>{if(event.touches.length===1)startX.current=event.touches[0].clientX;};
   const onTouchEnd=event=>{
     if(startX.current===null)return;
@@ -34,7 +46,6 @@ export default function MediaGallery({
     aria-label={`${project.title} project screenshots`}
     onMouseEnter={onKeepOpen}
     onMouseLeave={onLeave}
-    onWheel={onWheel}
     onTouchStart={onTouchStart}
     onTouchEnd={onTouchEnd}
   >
