@@ -289,3 +289,9 @@ html,body,#root{background:#f8fbff;color:#111827}
  .hud-brand span{display:none}
  .hud-help{display:block;max-width:calc(100vw - 205px)}
 }
+
+.world-map-heading button{
+ width:34px;min-width:34px;min-height:34px;display:grid;place-items:center;
+ grid-template-columns:none;padding:0;border:1px solid #bdcee1;
+ background:#fff;color:#05245A;border-radius:8px;
+}
