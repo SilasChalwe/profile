@@ -20,9 +20,9 @@ function savedBirdView() {
   if (!data || ![data.x, data.z, data.height, data.yaw].every(Number.isFinite) ||
     Math.abs(data.x) > LIMIT || Math.abs(data.z) > LIMIT ||
     data.height < BIRD_MIN_HEIGHT || data.height > BIRD_MAX_HEIGHT) {
-    return { x: 0, z: 0, height: 45, yaw: 0 };
+    return { x: 0, z: 0, height: 45, yaw: 0, tilt: 0 };
   }
-  return { x: data.x, z: data.z, height: data.height, yaw: normalizeAngle(data.yaw) };
+  return { x: data.x, z: data.z, height: data.height, yaw: normalizeAngle(data.yaw), tilt: Number.isFinite(data.tilt) ? THREE.MathUtils.clamp(data.tilt,0,.75) : 0 };
 }
 
 // Movement and looking are separate modes. Laptop touchpad two-finger scroll
@@ -161,9 +161,10 @@ export default function Player({ paused, viewMode = 'move' }) {
     };
     const onTouchMove = event => { touchMove.current = event.detail; };
     const onCameraTurn = event => {
-      const { yawDelta = 0, pitchDelta = 0, zoomDelta = 0, level = false } = event.detail || {};
+      const { yawDelta = 0, pitchDelta = 0, zoomDelta = 0, tiltDelta = 0, level = false, topDown = false } = event.detail || {};
       if (viewMode === 'bird') {
         aerial.current.yaw = normalizeAngle(aerial.current.yaw + yawDelta);
+        aerial.current.tilt = topDown ? 0 : THREE.MathUtils.clamp(aerial.current.tilt + tiltDelta, 0, .75);
         aerial.current.height = THREE.MathUtils.clamp(
           aerial.current.height + zoomDelta, BIRD_MIN_HEIGHT, BIRD_MAX_HEIGHT
         );
@@ -247,8 +248,16 @@ export default function Player({ paused, viewMode = 'move' }) {
         if (k.Equal || k.NumpadAdd) aerial.current.height = Math.max(BIRD_MIN_HEIGHT, aerial.current.height - delta * 26);
         if (k.Minus || k.NumpadSubtract) aerial.current.height = Math.min(BIRD_MAX_HEIGHT, aerial.current.height + delta * 26);
       }
-      camera.position.set(aerial.current.x, aerial.current.height, aerial.current.z);
-      camera.rotation.set(-Math.PI / 2, aerial.current.yaw, 0);
+      // At tilt=0, look straight down. Increasing tilt reveals the sides of
+      // buildings/terminals while keeping the area center in the crosshairs.
+      const height = aerial.current.height, tilt = aerial.current.tilt;
+      const outward = height * Math.tan(tilt);
+      camera.position.set(
+        aerial.current.x + Math.sin(aerial.current.yaw) * outward,
+        height,
+        aerial.current.z + Math.cos(aerial.current.yaw) * outward
+      );
+      camera.rotation.set(-Math.PI / 2 + tilt, aerial.current.yaw, 0);
       return;
     }
 
