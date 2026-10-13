@@ -25,13 +25,22 @@ assert.match(hud, /⌂ Start/, 'visitors need a visible return-to-start action')
 assert.match(hud, /2 FINGERS/, 'first-time visitors need instructions');
 assert.match(hud, /Switch to standard portfolio view/, 'visitors need a non-game alternative');
 assert.match(app, /onHome=\{\(\) => travel\('plaza'\)\}/, 'home navigation must be connected');
-assert.match(player, /addEventListener\('wheel', wheel, \{ passive: false \}\)/, 'two-finger scrolling must be handled on the 3D canvas');
+assert.match(player, /addEventListener\('wheel', onWheel, \{ passive: false \}\)/, 'two-finger scrolling must be handled on the 3D canvas');
 assert.match(player, /event\.preventDefault\(\)/, 'browser scrolling must not steal 3D navigation');
 assert.match(player, /event\.deltaX/, 'two-finger sideways swipe must work');
 assert.match(player, /event\.deltaY/, 'two-finger vertical swipe must work');
-assert.doesNotMatch(player, /pointerType === 'mouse'/, 'one-finger cursor input must never move camera');
+assert.match(player, /event\.pointerType === 'mouse' && event\.button === 2/, 'only right mouse button may rotate view');
+assert.doesNotMatch(player, /event\.button === 0/, 'single left clicks must never rotate the camera');
 assert.doesNotMatch(player, /requestPointerLock/, 'the cursor must remain freely usable');
 assert.match(css, /COLOR-ONLY REFINEMENT OF THE ORIGINAL LAYOUT/, 'white navigation theme is required');
+assert.match(hud, /Look 360°/, '360-degree camera view should be selectable');
+assert.match(hud, /Bird's-eye/, 'aerial view must be available');
+assert.match(hud, /Behind/, 'a direct look-behind option must be visible');
+assert.match(player, /viewMode === 'look'/, 'look mode should handle full camera rotation');
+assert.match(player, /viewMode === 'bird'/, 'bird mode must be implemented');
+assert.match(player, /camera\.rotation\.set\(-Math\.PI \/ 2, aerial\.current\.yaw, 0\)/, 'bird camera should look straight down');
+assert.match(player, /pitch\.current - dy \* \.006, -MAX_PITCH, MAX_PITCH/, 'two-finger vertical look should work');
+assert.match(player, /BIRD_MAX_HEIGHT/, 'bird camera zoom range should be controlled');
 
 // When teleporting to a zone, spawn on its inward-facing side, looking at the exhibit.
 // This prevents the backwards text / rear-of-pavilion view that was reported.
