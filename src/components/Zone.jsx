@@ -22,7 +22,7 @@ function ExhibitObject({ type, color }) {
   </group>;
 }
 
-export default function Zone({ zone, projects, onProject, onActive, onPreview, onPreviewLeave }) {
+export default function Zone({ zone, projects, onProject, onActive, onPreview, onPreviewLeave, onTravel, tourActive }) {
   const { camera } = useThree();
   const [near, setNear] = useState(false);
   const [page, setPage] = useState(0);
@@ -35,8 +35,23 @@ export default function Zone({ zone, projects, onProject, onActive, onPreview, o
     if (distance < 8) onActive(zone.id);
   });
   const inwardRotation = Math.atan2(-zone.position[0], -zone.position[2]);
+  // Clicking the zone title or its floor jumps straight there without walking.
+  // Project terminals keep their separate click-to-open behavior.
+  const jumpToZone = event => {
+    event.stopPropagation();
+    onTravel?.(zone.id);
+  };
+  const pointAtZone = event => {
+    event.stopPropagation();
+    document.body.classList.add('is-targeting');
+  };
+  const leaveZone = event => {
+    event.stopPropagation();
+    document.body.classList.remove('is-targeting');
+  };
   return <group position={zone.position} rotation={[0,inwardRotation,0]}>
-    <mesh receiveShadow position={[0,-.18,0]}>
+    <mesh receiveShadow position={[0,-.18,0]}
+      onClick={jumpToZone} onPointerOver={pointAtZone} onPointerOut={leaveZone}>
       <cylinderGeometry args={[7.3,8, .36, 8]} />
       <meshStandardMaterial color={near ? '#fff3e9' : '#ffffff'} roughness={.8} metalness={.07} />
     </mesh>
@@ -45,12 +60,19 @@ export default function Zone({ zone, projects, onProject, onActive, onPreview, o
       <meshBasicMaterial color={zone.color} transparent opacity={near ? .9 : .35} />
     </mesh>
     <ExhibitObject type={zone.id} color={zone.color} />
-    <Billboard follow lockX lockZ position={[0,5.1,0]}><Text fontSize={.52} color="#05245A" anchorX="center" anchorY="middle">{zone.label.toUpperCase()}</Text></Billboard>
+    <Billboard follow lockX lockZ position={[0,5.1,0]}
+      onClick={jumpToZone} onPointerOver={pointAtZone} onPointerOut={leaveZone}>
+      <mesh position={[0,0,-.06]}>
+        <planeGeometry args={[8.2,1.05]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <Text fontSize={.52} color="#05245A" anchorX="center" anchorY="middle">{zone.label.toUpperCase()}</Text>
+    </Billboard>
     <Billboard follow lockX lockZ position={[0,4.55,0]}><Text fontSize={.14} maxWidth={6.5} textAlign="center" color="#475569" anchorX="center">{zone.description}</Text></Billboard>
     {visibleProjects.map((project, index) => {
       const count = visibleProjects.length;
       const x = count === 1 ? 0 : (index - (count - 1) / 2) * 3.25;
-      return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} onPreview={onPreview} onPreviewLeave={onPreviewLeave} />;
+      return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} onPreview={onPreview} onPreviewLeave={onPreviewLeave} tourActive={tourActive} />;
     })}
     {maxPage > 0 && <Html center position={[0,.5,6]} distanceFactor={13}>
       <div className="zone-pagination" aria-label={`${zone.label} project pages`}>
