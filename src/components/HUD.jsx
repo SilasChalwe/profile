@@ -69,6 +69,8 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
         <button type="button" onClick={()=>adjustView({yawDelta:-Math.PI/4})}>Rotate ↷</button>
         <button type="button" onClick={()=>adjustView({zoomDelta:-12})}>+ Zoom</button>
         <button type="button" onClick={()=>adjustView({zoomDelta:12})}>− Zoom</button>
+        <button type="button" onClick={()=>adjustView({tiltDelta:.2})}>Tilt 3D</button>
+        <button type="button" onClick={()=>adjustView({topDown:true})}>Top-down</button>
       </div>}
     </section>
     <div className="reticle" aria-hidden="true"><i></i><i></i></div>
@@ -84,7 +86,7 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
     </nav>}
     {helpOpen && <section className="hud-quick-help" aria-label="How to explore">
       <strong>Explore the portfolio</strong>
-      <p>Use <b>Move</b> for two-finger walking and strafing. Switch to <b>Look 360°</b> and two-finger swipe to turn behind you or look up and down. <b>Bird's-eye</b> shows the world from above; two fingers pan, and the rotate/zoom buttons adjust the view.</p><p>A single finger still points and clicks on a laptop touchpad. With a mouse, right-drag rotates in Look mode. Q/E turn, R/F tilt, and WASD or arrow keys move.</p>
+      <p>Use <b>Move</b> for two-finger walking and strafing. Switch to <b>Look 360°</b> and two-finger swipe to turn behind you or look up and down. <b>Bird's-eye</b> shows the world from above; two fingers pan, and the rotate, zoom and tilt buttons adjust the view.</p><p>A single finger still points and clicks on a laptop touchpad. With a mouse, right-drag rotates in Look mode. Q/E turn, R/F tilt, and WASD or arrow keys move.</p>
       <p>Or select <b>Explore areas</b> to jump directly to a project zone. You can also use WASD or arrow keys.</p>
       <button type="button" onClick={()=>{setHelpOpen(false);setMapOpen(true)}}>Browse project areas →</button>
     </section>}
