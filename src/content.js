@@ -145,63 +145,6 @@ export const portfolio = {
       linkLabel: "View repository",
       visual: "hardware",
       media: { placeholder: true, label: "Device photography required" }
-    },
-    {
-      id: "gate",
-      number: "06",
-      title: "Gate",
-      strapline: "Messaging permissions and quarantine.",
-      category: ["design"],
-      discipline: "UI/UX Design",
-      status: "Evidence required",
-      statusTone: "progress",
-      role: "Interface and User Experience Design",
-      problem: "Inbox, allow/block and sender-permission flows needed clear distinction and usability.",
-      contribution: "Identified the brief and specified reusable screens.",
-      details: ["Inbox flows", "Permission management", "Quarantine views"],
-      tech: ["Figma"],
-      link: "#",
-      linkLabel: "View case study",
-      visual: "design",
-      media: { placeholder: true, label: "Approved screenshots required" }
-    },
-    {
-      id: "aimzo",
-      number: "07",
-      title: "AIMZO",
-      strapline: "Customer, provider and admin products.",
-      category: ["design"],
-      discipline: "UI/UX Design",
-      status: "Client approval required",
-      statusTone: "progress",
-      role: "Interface Design",
-      problem: "Complex multi-tenant ecosystem requiring distinct user journeys.",
-      contribution: "Supplied an 82-page interface document covering all scopes.",
-      details: ["Customer flows", "Provider dashboards", "Admin controls"],
-      tech: ["Figma"],
-      link: "#",
-      linkLabel: "View case study",
-      visual: "design",
-      media: { placeholder: true, label: "Client approval required for publication" }
-    },
-    {
-      id: "branddesign",
-      number: "08",
-      title: "BrandDesign",
-      strapline: "Brand colour application system.",
-      category: ["design"],
-      discipline: "UI/UX Design",
-      status: "Public Figma-linked project",
-      statusTone: "verified",
-      role: "Designer",
-      problem: "Designers need a consistent color application system.",
-      contribution: "Created a public code bundle linking to an original Figma design.",
-      details: ["Color palettes", "Component styling", "Application logic"],
-      tech: ["Figma", "CSS"],
-      link: "https://github.com/SilasChalwe/BrandDesign",
-      linkLabel: "View repository",
-      visual: "design",
-      media: { placeholder: false, label: "Figma Link Available" }
     }
   ],
 
@@ -296,10 +239,10 @@ export const portfolio = {
 };
 
 export const worldZones = [
-  { id: 'software', label: 'Software Engineering', short: 'Software', position: [0, 0, -24], color: '#66fcf1', projectIds: ['campusnest', 'covian', 'fix'], description: 'Backends, secure rendering and desktop systems.' },
-  { id: 'mobile', label: 'Mobile Applications', short: 'Mobile', position: [21, 0, -12], color: '#45a29e', projectIds: ['agrospeak'], description: 'Android, React Native and connected product experiences.' },
-  { id: 'design', label: 'UI/UX & Visual Design', short: 'Design', position: [21, 0, 13], color: '#ff4655', projectIds: ['gate', 'aimzo', 'branddesign'], description: 'Figma systems, journeys, interaction states and visual communication.' },
-  { id: 'ai', label: 'AI & Research', short: 'AI / ML', position: [0, 0, 25], color: '#c5c6c7', projectIds: [], description: 'Speech technology, computer vision and applied machine learning.' },
-  { id: 'embedded', label: 'Embedded Engineering', short: 'Embedded', position: [-21, 0, 13], color: '#f3ca40', projectIds: ['cs301'], description: 'Hardware/software integration, serial systems and connected devices.' },
-  { id: 'clients', label: 'Professional Experience', short: 'Experience', position: [-21, 0, -12], color: '#f2a900', projectIds: [], description: 'Client delivery, technical leadership and systems integration.' }
+  { id: 'software', label: 'Software Engineering', short: 'Software', position: [0, 0, -24], color: '#62d9ff', projectIds: ['campusnest', 'covian', 'fix'], description: 'Backends, secure rendering and desktop systems.' },
+  { id: 'mobile', label: 'Mobile Applications', short: 'Mobile', position: [21, 0, -12], color: '#b7f35c', projectIds: ['agrospeak'], description: 'Android, React Native and connected product experiences.' },
+  { id: 'design', label: 'UI/UX & Visual Design', short: 'Design', position: [21, 0, 13], color: '#ff8b5e', projectIds: [], description: 'Figma systems, journeys, interaction states and visual communication.' },
+  { id: 'ai', label: 'AI & Research', short: 'AI / ML', position: [0, 0, 25], color: '#c3a6ff', projectIds: [], description: 'Speech technology, computer vision and applied machine learning.' },
+  { id: 'embedded', label: 'Embedded Engineering', short: 'Embedded', position: [-21, 0, 13], color: '#ffd45e', projectIds: ['cs301'], description: 'Hardware/software integration, serial systems and connected devices.' },
+  { id: 'clients', label: 'Professional Experience', short: 'Experience', position: [-21, 0, -12], color: '#ef6d8e', projectIds: [], description: 'Client delivery, technical leadership and systems integration.' }
 ];
