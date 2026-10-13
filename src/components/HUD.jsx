@@ -29,7 +29,7 @@ function TouchControls() {
 }
 
 export default function HUD({
-  paused, setPaused, activeZone, onTravel, onHome, ambient, setAmbient,
+  paused, setPaused, activeZone, onTravel, onHome, onBack, canGoBack, ambient, setAmbient,
   effects, setEffects, quality, setQuality, onAccessible
 }) {
   const [areasOpen, setAreasOpen] = useState(false);
@@ -64,6 +64,7 @@ export default function HUD({
       <div className="hud-brand"><b>SC</b><span>INTERACTIVE PORTFOLIO</span></div>
       <div className="hud-location" aria-live="polite"><i></i>{current?.label || 'Central Plaza'}</div>
       <nav className="hud-actions" aria-label="Portfolio world navigation">
+        <button type="button" className="hud-back" onClick={() => { document.exitPointerLock?.(); onBack(); }} disabled={!canGoBack} title="Return to the previous exhibition">← Back</button>
         <button type="button" onClick={goHome} title="Return to the starting area">⌂ Start</button>
         <button type="button" className={areasOpen ? 'is-active' : ''} onClick={showAreas}
           aria-expanded={areasOpen} aria-controls="portfolio-area-list">Explore Areas</button>
