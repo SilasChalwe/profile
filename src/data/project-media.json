@@ -14,5 +14,81 @@
       "caption": "Original MFocus app screenshot",
       "kind": "screenshot"
     }
+  ],
+  "agrospeak": [
+    {
+      "src": "/projects/agrospeak/screen-01.webp",
+      "alt": "AGROSPEAK — original PDF page 1",
+      "caption": "AGROSPEAK — original PDF page 1",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-02.webp",
+      "alt": "AGROSPEAK — original PDF page 2",
+      "caption": "AGROSPEAK — original PDF page 2",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-03.webp",
+      "alt": "AGROSPEAK — original PDF page 3",
+      "caption": "AGROSPEAK — original PDF page 3",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-04.webp",
+      "alt": "AGROSPEAK — original PDF page 4",
+      "caption": "AGROSPEAK — original PDF page 4",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-06.webp",
+      "alt": "AGROSPEAK — original PDF page 6",
+      "caption": "AGROSPEAK — original PDF page 6",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-08.webp",
+      "alt": "AGROSPEAK — original PDF page 8",
+      "caption": "AGROSPEAK — original PDF page 8",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-11.webp",
+      "alt": "AGROSPEAK — original PDF page 11",
+      "caption": "AGROSPEAK — original PDF page 11",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/agrospeak/screen-16.webp",
+      "alt": "AGROSPEAK — original PDF page 16",
+      "caption": "AGROSPEAK — original PDF page 16",
+      "kind": "prototype"
+    }
+  ],
+  "aimzo": [
+    {
+      "src": "/projects/aimzo/admin.webp",
+      "alt": "AIMZO — screen 1",
+      "caption": "AIMZO — screen 1",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/aimzo/customer.webp",
+      "alt": "AIMZO — screen 2",
+      "caption": "AIMZO — screen 2",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/aimzo/overview.webp",
+      "alt": "AIMZO — screen 3",
+      "caption": "AIMZO — screen 3",
+      "kind": "prototype"
+    },
+    {
+      "src": "/projects/aimzo/provider.webp",
+      "alt": "AIMZO — screen 4",
+      "caption": "AIMZO — screen 4",
+      "kind": "prototype"
+    }
   ]
 }
