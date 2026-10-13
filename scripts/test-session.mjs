@@ -20,6 +20,17 @@ assert.equal(readSession().selectedProjectId, 'gate');
 assert.equal(readSession().effects, false);
 assert.deepEqual(readPose(), { position: [21, 2.2, 13], yaw: .8, pitch: -.2 });
 
+saveSession({
+  viewMode: 'bird',
+  pose: { position: [21, 2.2, 13], yaw: Math.PI, pitch: 1.4 },
+  birdView: { x: 4, z: -7, height: 47, yaw: -1.2, tilt: .4 }
+});
+assert.equal(readSession().viewMode, 'bird', 'camera mode must survive refresh');
+assert.deepEqual(readPose(), { position: [21, 2.2, 13], yaw: Math.PI, pitch: 1.4 },
+  'near-vertical looking pitch must survive refresh');
+assert.deepEqual(readSession().birdView, { x: 4, z: -7, height: 47, yaw: -1.2, tilt: .4 },
+  'bird camera pan, rotation, zoom and tilt must survive refresh');
+
 saveSession({ pose: { position: [150, 2.2, 13], yaw: 0, pitch: 0 } });
 assert.equal(readPose(), null, 'invalid camera positions must not be resumed');
 
