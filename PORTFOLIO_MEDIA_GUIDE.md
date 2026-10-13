@@ -143,3 +143,22 @@ in `src/lib/guided-tour.js`. Adding a new zone automatically adds it to
 the route without editing camera code. To verify route and player wiring,
 run `npm run check` and then confirm the actual camera motion in Chrome
 on both laptop touchpad and touch-screen devices.
+
+
+## Direct zone selection and visible route controls
+
+Visitors can click an exhibition **name or platform** inside the 3D world
+to jump instantly to its entrance. This is separate from the guided tour,
+which deliberately travels smoothly between areas.
+
+The always-visible **Route / Zones** button at the bottom-right opens the
+full list of destinations and also offers **Play guided route**. Picking a
+destination stops an active auto-tour, teleports immediately, faces the
+correct exhibition, and preserves Back navigation. The tour player stays
+near the right edge and camera controls near the left edge, so exhibition
+titles and projects are not covered. An oversized proximity popup is
+suppressed while the auto-tour plays.
+
+Verify on laptop and phone: click a zone label, click a platform, use
+Route / Zones to jump between areas, start a guided tour, then click a
+destination to exit the tour. The old WASD/touchpad movement still works.
