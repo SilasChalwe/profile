@@ -20,10 +20,18 @@ function TouchControls() {
   return <div className="touch-stick" onPointerDown={update} onPointerMove={event => { if (origin.current) update(event); }} onPointerUp={end} onPointerCancel={end} aria-label="Touch movement control"><i style={{ transform:`translate(${stick.x*28}px,${stick.y*28}px)` }}></i></div>;
 }
 
-export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, onBack, canGoBack, ambient, setAmbient, effects, setEffects, quality, setQuality, onAccessible }) {
+export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, onBack, canGoBack, viewMode, setViewMode, ambient, setAmbient, effects, setEffects, quality, setQuality, onAccessible }) {
   const [mapOpen, setMapOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const closeMaps = () => { setMapOpen(false); setHelpOpen(false); };
+  const changeMode = mode => {
+    portfolioAudio.play('select');
+    setViewMode(mode);
+    setMapOpen(false);
+  };
+  const adjustView = detail => window.dispatchEvent(
+    new CustomEvent('portfolio:camera-turn', { detail })
+  );
   const home = () => { closeMaps(); onHome(); };
   const back = () => { closeMaps(); onBack(); };
   return <div className="hud">
@@ -33,8 +41,42 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
       <button type="button" onClick={() => {setHelpOpen(v=>!v);setMapOpen(false);}} aria-expanded={helpOpen}>Help</button>
       <button type="button" onClick={() => {setPaused(true);setHelpOpen(false);setMapOpen(false)}} aria-label="Open settings">Settings</button>
     </nav></header>
+    <section className="camera-controls" aria-label="Camera and viewpoint controls">
+      <div className="camera-controls__modes" role="group" aria-label="Choose camera mode">
+        <button type="button" className={viewMode==='move'?'is-active':''}
+          aria-pressed={viewMode==='move'} onClick={()=>changeMode('move')} title="Two fingers move through the 3D world">
+          Move
+        </button>
+        <button type="button" className={viewMode==='look'?'is-active':''}
+          aria-pressed={viewMode==='look'} onClick={()=>changeMode('look')} title="Two fingers look left, right, up and down">
+          Look 360°
+        </button>
+        <button type="button" className={viewMode==='bird'?'is-active':''}
+          aria-pressed={viewMode==='bird'} onClick={()=>changeMode('bird')} title="Fly above the portfolio for a bird's-eye view">
+          Bird's-eye
+        </button>
+      </div>
+      {viewMode==='look' && <div className="camera-controls__actions" role="group" aria-label="Turn the camera">
+        <button type="button" onClick={()=>adjustView({yawDelta:Math.PI/4})} title="Turn left 45 degrees">↶ Left</button>
+        <button type="button" onClick={()=>adjustView({yawDelta:Math.PI})} title="Look directly behind you">Behind</button>
+        <button type="button" onClick={()=>adjustView({yawDelta:-Math.PI/4})} title="Turn right 45 degrees">Right ↷</button>
+        <button type="button" onClick={()=>adjustView({pitchDelta:.35})} title="Look up">↑ Up</button>
+        <button type="button" onClick={()=>adjustView({pitchDelta:-.35})} title="Look down">↓ Down</button>
+        <button type="button" onClick={()=>adjustView({level:true})} title="Return to a level view">Level</button>
+      </div>}
+      {viewMode==='bird' && <div className="camera-controls__actions" role="group" aria-label="Rotate and zoom overhead camera">
+        <button type="button" onClick={()=>adjustView({yawDelta:Math.PI/4})}>↶ Rotate</button>
+        <button type="button" onClick={()=>adjustView({yawDelta:-Math.PI/4})}>Rotate ↷</button>
+        <button type="button" onClick={()=>adjustView({zoomDelta:-12})}>+ Zoom</button>
+        <button type="button" onClick={()=>adjustView({zoomDelta:12})}>− Zoom</button>
+      </div>}
+    </section>
     <div className="reticle" aria-hidden="true"><i></i><i></i></div>
-    <div className="hud-help"><span>1 FINGER: POINT & CLICK</span><span>2 FINGERS: SWIPE TO MOVE</span><span>WASD / ARROWS: OPTIONAL</span></div>
+    <div className="hud-help">
+      <span>1 FINGER: POINT & CLICK</span>
+      <span>{viewMode==='move' ? '2 FINGERS: WALK & STRAFE' : viewMode==='look' ? '2 FINGERS: TURN & LOOK UP/DOWN' : '2 FINGERS: PAN OVERHEAD'}</span>
+      <span>{viewMode==='bird' ? 'Q/E: ROTATE · +/-: ZOOM' : 'Q/E: TURN · R/F: LOOK UP/DOWN'}</span>
+    </div>
     <button className="map-toggle" onClick={() => {setMapOpen(value=>!value);setHelpOpen(false)}} aria-expanded={mapOpen}>Explore areas <span>{mapOpen?'×':'+'}</span></button>
     {mapOpen && <nav className="world-map" aria-label="Jump to exhibition area">
       <button type="button" onClick={home}><span>⌂</span><i style={{background:'#05245A'}}></i>Central plaza</button>
@@ -42,7 +84,7 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
     </nav>}
     {helpOpen && <section className="hud-quick-help" aria-label="How to explore">
       <strong>Explore the portfolio</strong>
-      <p>Use two fingers to swipe on a laptop touchpad to walk forward, back or sideways. Use one finger to point and click a project.</p>
+      <p>Use <b>Move</b> for two-finger walking and strafing. Switch to <b>Look 360°</b> and two-finger swipe to turn behind you or look up and down. <b>Bird's-eye</b> shows the world from above; two fingers pan, and the rotate/zoom buttons adjust the view.</p><p>A single finger still points and clicks on a laptop touchpad. With a mouse, right-drag rotates in Look mode. Q/E turn, R/F tilt, and WASD or arrow keys move.</p>
       <p>Or select <b>Explore areas</b> to jump directly to a project zone. You can also use WASD or arrow keys.</p>
       <button type="button" onClick={()=>{setHelpOpen(false);setMapOpen(true)}}>Browse project areas →</button>
     </section>}
