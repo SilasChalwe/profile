@@ -1,0 +1,77 @@
+import React, { useEffect, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+
+const velocity = new THREE.Vector3();
+const direction = new THREE.Vector3();
+const forward = new THREE.Vector3();
+const right = new THREE.Vector3();
+
+export default function Player({ paused, onZone }) {
+  const { camera, gl } = useThree();
+  const keys = useRef({});
+  const yaw = useRef(0);
+  const pitch = useRef(-.08);
+  const travel = useRef(null);
+  const touch = useRef({ x: 0, y: 0 });
+  const touchLook = useRef(null);
+
+  useEffect(() => {
+    camera.rotation.order = 'YXZ';
+    const down = event => { keys.current[event.code] = true; };
+    const up = event => { keys.current[event.code] = false; };
+    const look = event => {
+      if (document.pointerLockElement !== gl.domElement || paused) return;
+      yaw.current -= event.movementX * .0018;
+      pitch.current = THREE.MathUtils.clamp(pitch.current - event.movementY * .0015, -.72, .55);
+    };
+    const click = event => {
+      if (!paused && event.pointerType !== 'touch' && event.target === gl.domElement && document.pointerLockElement !== gl.domElement) gl.domElement.requestPointerLock?.();
+    };
+    const touchStart = event => {
+      if (event.pointerType === 'touch' && event.clientX > window.innerWidth * .42) touchLook.current = { x:event.clientX, y:event.clientY, id:event.pointerId };
+    };
+    const touchMove = event => {
+      if (!touchLook.current || touchLook.current.id !== event.pointerId || paused) return;
+      yaw.current -= (event.clientX - touchLook.current.x) * .006;
+      pitch.current = THREE.MathUtils.clamp(pitch.current - (event.clientY - touchLook.current.y) * .005, -.72, .55);
+      touchLook.current = { x:event.clientX, y:event.clientY, id:event.pointerId };
+    };
+    const touchEnd = event => { if (touchLook.current?.id === event.pointerId) touchLook.current = null; };
+    const travelHandler = event => { travel.current = new THREE.Vector3(event.detail.position[0], 2.2, event.detail.position[2] + 7); };
+    const touchHandler = event => { touch.current = event.detail; };
+    window.addEventListener('keydown', down); window.addEventListener('keyup', up);
+    document.addEventListener('mousemove', look); gl.domElement.addEventListener('click', click);
+    gl.domElement.addEventListener('pointerdown', touchStart); gl.domElement.addEventListener('pointermove', touchMove); gl.domElement.addEventListener('pointerup', touchEnd);
+    window.addEventListener('portfolio:travel', travelHandler);
+    window.addEventListener('portfolio:move', touchHandler);
+    return () => {
+      window.removeEventListener('keydown', down); window.removeEventListener('keyup', up);
+      document.removeEventListener('mousemove', look); gl.domElement.removeEventListener('click', click);
+      gl.domElement.removeEventListener('pointerdown', touchStart); gl.domElement.removeEventListener('pointermove', touchMove); gl.domElement.removeEventListener('pointerup', touchEnd);
+      window.removeEventListener('portfolio:travel', travelHandler);
+      window.removeEventListener('portfolio:move', touchHandler);
+    };
+  }, [camera, gl, paused]);
+
+  useFrame((_, delta) => {
+    if (paused) return;
+    if (travel.current) {
+      camera.position.lerp(travel.current, Math.min(1, delta * 3.2));
+      if (camera.position.distanceTo(travel.current) < .15) travel.current = null;
+    }
+    const k = keys.current;
+    const x = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0) + touch.current.x;
+    const z = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0) - touch.current.y;
+    direction.set(x, 0, z).normalize();
+    camera.getWorldDirection(forward); forward.y = 0; forward.normalize();
+    right.crossVectors(forward, camera.up).normalize();
+    velocity.set(0, 0, 0).addScaledVector(forward, direction.z).addScaledVector(right, direction.x);
+    camera.position.addScaledVector(velocity, delta * (k.ShiftLeft ? 9 : 5.2));
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -34, 34);
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z, -34, 34);
+    camera.position.y = 2.2;
+    camera.rotation.set(pitch.current, yaw.current, 0);
+  });
+  return null;
+}

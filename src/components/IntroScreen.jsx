@@ -1,0 +1,22 @@
+import React, { useState } from 'react';
+
+export default function IntroScreen({ visible, onEnter, onAccessible }) {
+  const [sound, setSound] = useState(false);
+  if (!visible) return null;
+  return <main className="entry-screen">
+    <div className="entry-grid" aria-hidden="true"></div>
+    <header className="entry-header"><span>SC / PORTFOLIO V2</span><span>ZAMBIA · 2026</span></header>
+    <div className="entry-orbit" aria-hidden="true"><i></i><i></i><i></i><b>SC</b></div>
+    <section className="entry-copy">
+      <p>COMPUTER ENGINEER · SOFTWARE ENGINEER · UI/UX DESIGNER</p>
+      <h1><span>SILAS</span><span>CHALWE</span></h1>
+      <p className="entry-copy__lede">Enter a navigable exhibition of systems, interfaces and engineering work.</p>
+      <div className="entry-actions">
+        <button className="primary-action" onClick={() => onEnter(sound)}>Enter world <span>→</span></button>
+        <button className={`sound-choice ${sound ? 'is-on' : ''}`} onClick={() => setSound(value => !value)} aria-pressed={sound}>Ambient sound: {sound ? 'on' : 'off'}</button>
+        <button className="text-button" onClick={onAccessible}>Open accessible portfolio</button>
+      </div>
+    </section>
+    <div className="entry-help"><span>WASD / ARROWS TO MOVE</span><span>MOUSE TO LOOK</span><span>CLICK TERMINALS TO INSPECT</span></div>
+  </main>;
+}
