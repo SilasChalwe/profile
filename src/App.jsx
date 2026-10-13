@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr, Preload } from '@react-three/drei';
 import { portfolio, worldZones } from './content.js';
 import { portfolioAudio } from './lib/audio.js';
 import { readSession, saveSession } from './lib/session.js';
 import World from './components/World.jsx';
+import MediaGallery from './components/MediaGallery.jsx';
 import IntroScreen from './components/IntroScreen.jsx';
 import HUD from './components/HUD.jsx';
 import ProjectPanel from './components/ProjectPanel.jsx';
@@ -23,6 +24,8 @@ export default function App() {
       : []
   );
   const [accessible, setAccessible] = useState(() => accessibleLink || saved?.accessible === true || reduceMotion);
+  const [previewProjectId, setPreviewProjectId] = useState(null);
+  const previewLeaveTimer = useRef(null);
   const [selectedProject, setSelectedProject] = useState(() =>
     portfolio.projects.find(item => item.id === saved?.selectedProjectId) || null
   );
@@ -81,10 +84,26 @@ export default function App() {
     portfolioAudio.play('enter');
   };
 
+  const previewProject = projectId => {
+    if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
+    previewLeaveTimer.current = null;
+    setPreviewProjectId(projectId);
+  };
+  const schedulePreviewClose = projectId => {
+    if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
+    previewLeaveTimer.current = setTimeout(() => {
+      setPreviewProjectId(current => current === projectId ? null : current);
+    }, 550);
+  };
+  useEffect(() => () => {
+    if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
+  }, []);
+
   const openProject = projectId => {
     const project = portfolio.projects.find(item => item.id === projectId);
     if (!project) return;
     portfolioAudio.play('open');
+    setPreviewProjectId(null);
     setSelectedProject(project);
     setPaused(true);
     document.exitPointerLock?.();
@@ -144,7 +163,7 @@ export default function App() {
         onCreated={({ gl }) => { gl.domElement.setAttribute('aria-label', 'Interactive 3D portfolio world'); }}
       >
         <World paused={paused || !entered || accessible || Boolean(selectedProject)}
-          quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} />
+          quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} onPreview={previewProject} onPreviewLeave={schedulePreviewClose} />
         <AdaptiveDpr pixelated />
         <Preload all />
       </Canvas>
@@ -166,6 +185,18 @@ export default function App() {
       />
     </div>
 
+    {entered && !accessible && !selectedProject && previewProjectId && (() => {
+      const project = portfolio.projects.find(item => item.id === previewProjectId);
+      if (!project) return null;
+      return <aside className="world-project-preview" aria-label={`${project.title} preview gallery`}>
+        <button type="button" className="world-project-preview__close"
+          onClick={() => setPreviewProjectId(null)} aria-label="Close project preview">×</button>
+        <MediaGallery key={project.id} project={project} compact
+          onKeepOpen={() => previewProject(project.id)}
+          onLeave={() => schedulePreviewClose(project.id)}
+          onOpen={openProject} />
+      </aside>;
+    })()}
     {selectedProject && <ProjectPanel project={selectedProject} onClose={() => {
       setSelectedProject(null);
       setPaused(false);
