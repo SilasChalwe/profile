@@ -62,9 +62,16 @@ export default function Player({ paused, onZone }) {
     };
     const touchEnd = event => { if (touchLook.current?.id === event.pointerId) touchLook.current = null; };
     const travelHandler = event => {
-      const { position, home } = event.detail;
-      travel.current = new THREE.Vector3(home ? 0 : position[0], 2.2, home ? 8 : position[2] + 7);
-      yaw.current = 0;
+      const { position, home, yaw: nextYaw = 0 } = event.detail;
+      // Every zone is seen from its front; visitors do not spawn behind exhibits.
+      travel.current = home
+        ? new THREE.Vector3(0, 2.2, 8)
+        : new THREE.Vector3(
+            position[0] + Math.sin(nextYaw) * 8,
+            2.2,
+            position[2] + Math.cos(nextYaw) * 8
+          );
+      yaw.current = nextYaw;
       pitch.current = -.08;
       keys.current = {};
       touch.current = { x: 0, y: 0 };
