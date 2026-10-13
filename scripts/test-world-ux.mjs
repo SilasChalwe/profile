@@ -38,7 +38,10 @@ assert.match(hud, /Bird's-eye/, 'aerial view must be available');
 assert.match(hud, /Behind/, 'a direct look-behind option must be visible');
 assert.match(player, /viewMode === 'look'/, 'look mode should handle full camera rotation');
 assert.match(player, /viewMode === 'bird'/, 'bird mode must be implemented');
-assert.match(player, /camera\.rotation\.set\(-Math\.PI \/ 2, aerial\.current\.yaw, 0\)/, 'bird camera should look straight down');
+assert.match(player, /camera\.rotation\.set\(-Math\.PI \/ 2 \+ tilt, aerial\.current\.yaw, 0\)/, 'bird camera must support top-down and tilted aerial perspectives');
+assert.match(player, /height \* Math\.tan\(tilt\)/, 'aerial tilt must preserve the target area at the center');
+assert.match(hud, /Top-down/, 'overhead controls must offer a straight-down reset');
+assert.match(hud, /Tilt 3D/, 'overhead controls must offer an angled view');
 assert.match(player, /pitch\.current - dy \* \.006, -MAX_PITCH, MAX_PITCH/, 'two-finger vertical look should work');
 assert.match(player, /BIRD_MAX_HEIGHT/, 'bird camera zoom range should be controlled');
 
