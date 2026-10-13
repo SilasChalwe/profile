@@ -3,7 +3,7 @@ import { Html, Text, Billboard } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export default function Terminal({ position, rotation = [0,0,0], project, color, onOpen }) {
+export default function Terminal({ position, rotation = [0,0,0], project, color, onOpen, onPreview, onPreviewLeave }) {
   const ref = useRef();
   const { camera } = useThree();
   const [hovered, setHovered] = useState(false);
@@ -17,7 +17,25 @@ export default function Terminal({ position, rotation = [0,0,0], project, color,
   });
   const active = hovered || near;
   return <group ref={ref} position={position} rotation={rotation}><Billboard follow lockX lockZ>
-    <mesh castShadow onPointerOver={event => { event.stopPropagation(); setHovered(true); document.body.classList.add('is-targeting'); }} onPointerOut={() => { setHovered(false); document.body.classList.remove('is-targeting'); }} onClick={event => { event.stopPropagation(); onOpen(project.id); }}>
+    <mesh castShadow onPointerOver={event => {
+      event.stopPropagation();
+      setHovered(true);
+      onPreview?.(project.id);
+      document.body.classList.add('is-targeting');
+    }}
+    onPointerOut={event => {
+      event.stopPropagation();
+      setHovered(false);
+      onPreviewLeave?.(project.id);
+      document.body.classList.remove('is-targeting');
+    }}
+    onClick={event => {
+      event.stopPropagation();
+      // On touchscreen the first tap shows the preview; an explicit button
+      // inside the gallery opens the case study. Mouse click retains its action.
+      if (event.nativeEvent?.pointerType === 'touch') onPreview?.(project.id);
+      else onOpen(project.id);
+    }}>
       <boxGeometry args={[2.8, 2.1, .22]} />
       <meshStandardMaterial color={active ? '#fff1e6' : '#ffffff'} emissive={color} emissiveIntensity={active ? .045 : 0} metalness={.06} roughness={.52} />
     </mesh>
