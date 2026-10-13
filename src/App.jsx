@@ -93,7 +93,11 @@ export default function App() {
     portfolioAudio.play('travel');
     setActiveZone(zoneId);
     window.dispatchEvent(new CustomEvent('portfolio:travel', {
-      detail: { position: isHome ? [0, 0, 0] : zone.position, home: isHome }
+      detail: {
+        position: isHome ? [0, 0, 0] : zone.position,
+        home: isHome,
+        yaw: isHome ? 0 : Math.atan2(-zone.position[0], -zone.position[2])
+      }
     }));
     setPaused(false);
   };
