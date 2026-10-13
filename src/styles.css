@@ -342,3 +342,6 @@ html,body,#root{background:#ffffff;color:#05245A}
  .tour-player__actions{justify-content:flex-end}
  .hud-actions button{font-size:.52rem;padding:.32rem .3rem}
 }
+
+/* Tour captions are populated from actual project records. */
+.tour-player__info em{color:#475569;font:500 .65rem/1.35 Manrope,sans-serif;font-style:normal;overflow-wrap:anywhere}
