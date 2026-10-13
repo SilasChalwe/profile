@@ -17,6 +17,11 @@ export default function App() {
 
   const [entered, setEntered] = useState(() => saved?.entered === true);
   const [paused, setPaused] = useState(() => saved?.paused === true);
+  const [visitedZones, setVisitedZones] = useState(() =>
+    Array.isArray(saved?.visitedZones)
+      ? saved.visitedZones.filter(id => id === 'plaza' || worldZones.some(zone => zone.id === id)).slice(-20)
+      : []
+  );
   const [accessible, setAccessible] = useState(() => accessibleLink || saved?.accessible === true || reduceMotion);
   const [selectedProject, setSelectedProject] = useState(() =>
     portfolio.projects.find(item => item.id === saved?.selectedProjectId) || null
@@ -40,11 +45,11 @@ export default function App() {
 
   useEffect(() => {
     saveSession({
-      entered, paused, accessible, activeZone,
+      entered, paused, accessible, activeZone, visitedZones,
       selectedProjectId: selectedProject?.id || null,
       effects, quality
     });
-  }, [entered, paused, accessible, activeZone, selectedProject, effects, quality]);
+  }, [entered, paused, accessible, activeZone, visitedZones, selectedProject, effects, quality]);
 
   // Refreshing a bookmarked accessible section should restore that section.
   useEffect(() => {
@@ -85,10 +90,13 @@ export default function App() {
     document.exitPointerLock?.();
   };
 
-  const travel = zoneId => {
+  const travel = (zoneId, recordHistory = true) => {
     const isHome = zoneId === 'plaza';
     const zone = worldZones.find(item => item.id === zoneId);
     if (!isHome && !zone) return;
+    if (recordHistory && zoneId !== activeZone) {
+      setVisitedZones(history => [...history, activeZone].slice(-20));
+    }
     document.exitPointerLock?.();
     portfolioAudio.play('travel');
     setActiveZone(zoneId);
@@ -100,6 +108,13 @@ export default function App() {
       }
     }));
     setPaused(false);
+  };
+
+  const goBack = () => {
+    if (!visitedZones.length) return;
+    const previous = visitedZones[visitedZones.length - 1];
+    setVisitedZones(history => history.slice(0, -1));
+    travel(previous, false);
   };
 
   const toggleAmbient = value => { setAmbient(value); portfolioAudio.setAmbient(value); };
@@ -139,6 +154,8 @@ export default function App() {
         activeZone={activeZone}
         onTravel={travel}
         onHome={() => travel('plaza')}
+        onBack={goBack}
+        canGoBack={visitedZones.length > 0}
         ambient={ambient}
         setAmbient={toggleAmbient}
         effects={effects}
