@@ -105,10 +105,25 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
       <span>{viewMode==='move' ? '2 FINGERS: WALK & STRAFE' : viewMode==='look' ? '2 FINGERS: TURN & LOOK UP/DOWN' : '2 FINGERS: PAN OVERHEAD'}</span>
       <span>{viewMode==='bird' ? 'Q/E: ROTATE · +/-: ZOOM' : 'Q/E: TURN · R/F: LOOK UP/DOWN'}</span>
     </div>
-    <button className="map-toggle" onClick={() => {setMapOpen(value=>!value);setHelpOpen(false)}} aria-expanded={mapOpen}>Explore areas <span>{mapOpen?'×':'+'}</span></button>
-    {mapOpen && <nav className="world-map" aria-label="Jump to exhibition area">
+    <button className="map-toggle" type="button"
+      onClick={() => {setMapOpen(value=>!value);setHelpOpen(false)}}
+      aria-expanded={mapOpen} aria-controls="portfolio-routes" title="See all exhibition areas and jump to any destination">
+      Route / Zones <span>{mapOpen?'×':'☰'}</span>
+    </button>
+    {mapOpen && <nav id="portfolio-routes" className="world-map" aria-label="Choose an exhibition destination">
+      <div className="world-map__heading">
+        <strong>Choose a destination</strong>
+        <button type="button" onClick={() => setMapOpen(false)} aria-label="Close route list">×</button>
+      </div>
+      <p className="world-map__hint">Select any area to jump there instantly, or play the complete guided route.</p>
+      <button type="button" className="world-map__tour" onClick={() => {closeMaps();onStartTour();}}>
+        ▶ Play guided route
+      </button>
       <button type="button" onClick={home}><span>⌂</span><i style={{background:'#05245A'}}></i>Central plaza</button>
-      {worldZones.map((zone,index)=><button type="button" key={zone.id} className={zone.id===activeZone?'is-active':''} onClick={()=>{onTravel(zone.id);closeMaps()}}><span>0{index+1}</span><i style={{background:zone.color}}></i>{zone.label}</button>)}
+      {worldZones.map((zone,index)=><button type="button" key={zone.id}
+        className={zone.id===activeZone?'is-active':''} onClick={()=>{onTravel(zone.id);closeMaps()}}>
+        <span>{String(index+1).padStart(2,'0')}</span><i style={{background:zone.color}}></i>{zone.label}
+      </button>)}
     </nav>}
     {helpOpen && <section className="hud-quick-help" aria-label="How to explore">
       <strong>Explore the portfolio</strong>
