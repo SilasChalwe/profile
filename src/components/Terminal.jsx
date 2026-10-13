@@ -3,7 +3,7 @@ import { Html, Text, Billboard } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export default function Terminal({ position, rotation = [0,0,0], project, color, onOpen, onPreview, onPreviewLeave }) {
+export default function Terminal({ position, rotation = [0,0,0], project, color, onOpen, onPreview, onPreviewLeave, tourActive = false }) {
   const ref = useRef();
   const { camera } = useThree();
   const [hovered, setHovered] = useState(false);
@@ -46,6 +46,8 @@ export default function Terminal({ position, rotation = [0,0,0], project, color,
     <Text position={[0,.42,.15]} fontSize={.25} maxWidth={2.1} textAlign="center" color="#05245A" anchorX="center">{project.title.toUpperCase()}</Text>
     <Text position={[0,-.05,.15]} fontSize={.105} maxWidth={2} lineHeight={1.35} textAlign="center" color="#475569" anchorX="center">{project.discipline}</Text>
     <Text position={[0,-.58,.15]} fontSize={.085} color={active ? '#FE6202' : '#475569'} anchorX="center">{active ? 'CLICK TO INSPECT' : project.status.toUpperCase()}</Text>
-    {active && <Html center position={[0,1.45,0]} distanceFactor={10}><div className="world-prompt">{near ? 'In range · click to inspect' : 'Project terminal'}</div></Html>}
+    {hovered && !tourActive && <Html center position={[0,1.45,0]} distanceFactor={10}>
+      <div className="world-prompt">Click to inspect</div>
+    </Html>}
   </Billboard></group>;
 }
