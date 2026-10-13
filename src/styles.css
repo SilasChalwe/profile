@@ -247,3 +247,48 @@ html,body,#root{background:#ffffff;color:#05245A}
  display:block;width:100%;max-height:240px;object-fit:contain;object-position:center;
  margin:1rem 0;border:1px solid #dce5f0;border-radius:9px;background:#f8fbff;
 }
+
+/* Camera control overlay only — preserve original scene and portfolio design. */
+.camera-controls{
+ position:absolute;
+ z-index:21;
+ top:5.4rem;left:50%;transform:translateX(-50%);
+ display:flex;flex-direction:column;align-items:center;gap:.42rem;
+ width:max-content;max-width:min(96vw,740px);
+ pointer-events:auto;
+}
+.camera-controls__modes,
+.camera-controls__actions{
+ display:flex;justify-content:center;align-items:center;gap:.3rem;flex-wrap:wrap;
+ background:rgba(255,255,255,.96);
+ border:1px solid #c5d5e7;border-radius:12px;
+ padding:.3rem;box-shadow:0 8px 22px rgba(5,36,90,.11);
+}
+.camera-controls button{
+ background:transparent;color:#05245A;border:1px solid transparent;
+ border-radius:8px;min-height:36px;padding:.48rem .76rem;
+ font:700 .72rem Manrope,sans-serif;white-space:nowrap;cursor:pointer;
+}
+.camera-controls button:hover,.camera-controls button:focus-visible{
+ background:#eaf1fa;border-color:#c5d5e7;
+}
+.camera-controls button.is-active,.camera-controls button[aria-pressed="true"]{
+ background:#05245A;color:#fff;border-color:#05245A;
+}
+.camera-controls__actions button{
+ background:#f8fbff;border-color:#d7e2f0;font-size:.67rem;padding:.4rem .65rem;
+}
+@media(max-width:1050px){
+ .camera-controls{top:7.7rem}
+}
+@media(max-width:700px){
+ .camera-controls{top:7.9rem;width:min(96vw,420px);gap:.3rem}
+ .camera-controls__modes,.camera-controls__actions{width:100%;padding:.2rem;gap:.18rem}
+ .camera-controls__modes button{flex:1;padding:.38rem .4rem;min-height:34px;font-size:.66rem}
+ .camera-controls__actions button{min-height:31px;padding:.28rem .42rem;font-size:.6rem}
+}
+@media(max-width:380px){
+ .camera-controls{top:7.6rem}
+ .camera-controls__modes button{font-size:.59rem}
+ .camera-controls__actions button{font-size:.55rem}
+}
