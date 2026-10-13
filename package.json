@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "node scripts/test-session.mjs && node scripts/test-world-ux.mjs && node scripts/validate-content.mjs && vite build"
+    "check": "node scripts/test-session.mjs && node scripts/test-world-ux.mjs && node scripts/test-gallery-data.mjs && node scripts/validate-content.mjs && vite build",
+    "media:sync": "node scripts/sync-media.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
