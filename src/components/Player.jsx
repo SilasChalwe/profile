@@ -148,7 +148,7 @@ export default function Player({ paused, viewMode = 'move', tourStatus = 'idle',
     };
 
     const onTravel = event => {
-      const { position, home, yaw: nextYaw = 0 } = event.detail;
+      const { position, home, yaw: nextYaw = 0, instant = false } = event.detail;
       const x = home ? 0 : position[0], z = home ? 0 : position[2];
       groundPosition.current.set(
         clampWorld(x + Math.sin(nextYaw) * (home ? 0 : 8)),
@@ -159,7 +159,17 @@ export default function Player({ paused, viewMode = 'move', tourStatus = 'idle',
       pitch.current = -.08;
       aerial.current.x = clampWorld(x);
       aerial.current.z = clampWorld(z);
-      if (viewMode !== 'bird') travel.current = groundPosition.current.clone();
+      if (viewMode !== 'bird') {
+        if (instant) {
+          travel.current = null;
+          camera.position.copy(groundPosition.current);
+          camera.rotation.set(pitch.current, yaw.current, 0);
+        } else {
+          travel.current = groundPosition.current.clone();
+        }
+      } else {
+        travel.current = null;
+      }
       keys.current = {};
       scrollMovement.current.set(0, 0, 0);
       touchMove.current = { x: 0, y: 0 };
