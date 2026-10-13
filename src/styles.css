@@ -135,3 +135,14 @@ html,body,#root{background:#ffffff;color:#05245A}
  .project-panel{padding:4.5rem 1rem 2rem}
  .project-panel header h2{font-size:clamp(1.9rem,9vw,3.4rem)}
 }
+
+/* Keep approved original media inside its case-study frame on all screens. */
+.project-media-actual{
+ width:min(100%,940px);margin:0 auto;display:block;padding:clamp(.65rem,2vw,1.25rem);
+ background:#f4f8fd;border:1px solid #d4deeb;text-align:center;
+}
+.project-media-actual img{
+ display:block;margin:0 auto;max-width:100%;max-height:min(68vh,680px);
+ object-fit:contain;width:auto;height:auto;
+}
+.project-media-actual figcaption{padding:.8rem 0 0;color:#475569;font-size:.75rem;line-height:1.5}
