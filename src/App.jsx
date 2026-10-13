@@ -19,6 +19,11 @@ export default function App() {
   const [entered, setEntered] = useState(() => saved?.entered === true);
   const [paused, setPaused] = useState(() => saved?.paused === true);
   const [viewMode, setViewMode] = useState(() => ['move','look','bird'].includes(saved?.viewMode) ? saved.viewMode : 'move');
+  const [tour, setTour] = useState({
+    status: 'idle', runId: 0, index: 0, total: worldZones.length,
+    phase: 'travelling', label: ''
+  });
+
   const [visitedZones, setVisitedZones] = useState(() =>
     Array.isArray(saved?.visitedZones)
       ? saved.visitedZones.filter(id => id === 'plaza' || worldZones.some(zone => zone.id === id)).slice(-20)
@@ -85,6 +90,46 @@ export default function App() {
     portfolioAudio.play('enter');
   };
 
+  const startTour = () => {
+    setEntered(true);
+    setAccessible(false);
+    setPaused(false);
+    setSelectedProject(null);
+    setPreviewProjectId(null);
+    setViewMode('move');
+    portfolioAudio.play('enter');
+    setTour(previous => ({
+      status: 'playing', runId: previous.runId + 1,
+      index: 0, total: worldZones.length, phase: 'travelling',
+      label: 'Starting at the central plaza'
+    }));
+  };
+  const pauseTour = () => setTour(previous =>
+    previous.status === 'playing' ? { ...previous, status: 'paused' } : previous
+  );
+  const resumeTour = () => {
+    setPaused(false);
+    setTour(previous =>
+      previous.status === 'paused' ? { ...previous, status: 'playing' } : previous
+    );
+  };
+  const stopTour = () => setTour(previous => ({
+    ...previous, status: 'idle', index: 0, label: ''
+  }));
+  const onTourStep = step => {
+    setTour(previous => ({ ...previous, ...step }));
+    if (step.phase === 'visiting') setActiveZone(step.id);
+    if (step.id === 'plaza') setActiveZone('plaza');
+  };
+  const finishTour = () => {
+    setTour(previous => ({ ...previous, status: 'complete', label: 'Tour complete', index: previous.total }));
+    setActiveZone('plaza');
+  };
+  const changeViewMode = mode => {
+    stopTour();
+    setViewMode(mode);
+  };
+
   const previewProject = projectId => {
     if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
     previewLeaveTimer.current = null;
@@ -104,6 +149,7 @@ export default function App() {
     const project = portfolio.projects.find(item => item.id === projectId);
     if (!project) return;
     portfolioAudio.play('open');
+    stopTour();
     setPreviewProjectId(null);
     setSelectedProject(project);
     setPaused(true);
@@ -114,6 +160,7 @@ export default function App() {
     const isHome = zoneId === 'plaza';
     const zone = worldZones.find(item => item.id === zoneId);
     if (!isHome && !zone) return;
+    stopTour();
     if (recordHistory && zoneId !== activeZone) {
       setVisitedZones(history => [...history, activeZone].slice(-20));
     }
@@ -151,10 +198,11 @@ export default function App() {
     setAccessible(false);
     setEntered(true);
     setPaused(false);
+    stopTour();
   };
 
   return <div className="app-shell">
-    <IntroScreen visible={!entered && !accessible} onEnter={enterWorld} onAccessible={() => setAccessible(true)} />
+    <IntroScreen visible={!entered && !accessible} onEnter={enterWorld} onTour={startTour} onAccessible={() => setAccessible(true)} />
 
     <div className={`world-shell ${entered && !accessible ? 'is-active' : ''}`} aria-hidden={accessible || !entered}>
       <Canvas
@@ -163,7 +211,9 @@ export default function App() {
         gl={{ antialias: quality === 'high', powerPreference: 'high-performance', alpha: false }}
         onCreated={({ gl }) => { gl.domElement.setAttribute('aria-label', 'Interactive 3D portfolio world'); }}
       >
-        <World viewMode={viewMode} paused={paused || !entered || accessible || Boolean(selectedProject)}
+        <World viewMode={viewMode} tourStatus={tour.status} tourRunId={tour.runId}
+          onTourStep={onTourStep} onTourFinish={finishTour}
+          paused={paused || !entered || accessible || Boolean(selectedProject)}
           quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} onPreview={previewProject} onPreviewLeave={schedulePreviewClose} />
         <AdaptiveDpr pixelated />
         <Preload all />
@@ -173,7 +223,12 @@ export default function App() {
         setPaused={setPaused}
         activeZone={activeZone}
         viewMode={viewMode}
-        setViewMode={setViewMode}
+        setViewMode={changeViewMode}
+        tour={tour}
+        onStartTour={startTour}
+        onPauseTour={pauseTour}
+        onResumeTour={resumeTour}
+        onStopTour={stopTour}
         onTravel={travel}
         onHome={() => travel('plaza')}
         onBack={goBack}
