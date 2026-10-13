@@ -34,13 +34,13 @@ export default function App() {
     setAmbient(withSound);
     if (withSound) portfolioAudio.setAmbient(true);
     portfolioAudio.effectsEnabled = effects;
-    portfolioAudio.click(300);
+    portfolioAudio.play('enter');
   };
 
   const openProject = projectId => {
     const project = portfolio.projects.find(item => item.id === projectId);
     if (!project) return;
-    portfolioAudio.click(520);
+    portfolioAudio.play('open');
     setSelectedProject(project);
     setPaused(true);
     document.exitPointerLock?.();
@@ -49,14 +49,14 @@ export default function App() {
   const travel = zoneId => {
     const zone = worldZones.find(item => item.id === zoneId);
     if (!zone) return;
-    portfolioAudio.click(350);
+    portfolioAudio.play('travel');
     setActiveZone(zoneId);
     window.dispatchEvent(new CustomEvent('portfolio:travel', { detail: { position: zone.position } }));
     setPaused(false);
   };
 
   const toggleAmbient = value => { setAmbient(value); portfolioAudio.setAmbient(value); };
-  const toggleEffects = value => { setEffects(value); portfolioAudio.effectsEnabled = value; if (value) portfolioAudio.click(); };
+  const toggleEffects = value => { setEffects(value); portfolioAudio.effectsEnabled = value; if (value) portfolioAudio.play('select'); };
 
   return <div className="app-shell">
     <IntroScreen visible={!entered && !accessible} onEnter={enterWorld} onAccessible={() => setAccessible(true)} />
