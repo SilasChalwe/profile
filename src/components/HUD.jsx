@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { worldZones } from '../content.js';
+import { worldZones, projectsForZone } from '../content.js';
 import { portfolioAudio } from '../lib/audio.js';
 
 function TouchControls() {
@@ -81,6 +81,9 @@ export default function HUD({ paused, setPaused, activeZone, onTravel, onHome, o
           <span>{tour.status === 'complete' ? 'You can explore freely or watch again' :
             `${tour.phase === 'visiting' ? 'Viewing' : 'Travelling to'}: ${tour.label}`}</span>
           <small>{tour.status === 'complete' ? 'Finished' : `Area ${tour.index} of ${tour.total}`}</small>
+          {tour.status !== 'complete' && tour.phase === 'visiting' && projectsForZone(tour.id).length > 0 && (
+            <em>Featured: {projectsForZone(tour.id).map(project=>project.title).join(' · ')}</em>
+          )}
         </div>
         <div className="tour-player__actions">
           {tour.status === 'complete' ? (
