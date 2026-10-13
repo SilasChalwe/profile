@@ -345,3 +345,98 @@ html,body,#root{background:#ffffff;color:#05245A}
 
 /* Tour captions are populated from actual project records. */
 .tour-player__info em{color:#475569;font:500 .65rem/1.35 Manrope,sans-serif;font-style:normal;overflow-wrap:anywhere}
+
+
+/* NAVIGATION CORRECTION: keep route and tour controls off the center of the scene.
+   No changes to the original Three.js geometry or colors. */
+.hud-top{
+ position:relative;z-index:32;
+}
+.camera-controls{
+ left:var(--pad);right:auto;top:5.8rem;bottom:auto;transform:none;
+ align-items:flex-start;max-width:min(420px,calc(100vw - 2rem));
+}
+.camera-controls__modes,.camera-controls__actions{max-width:100%}
+.tour-player{
+ left:auto;right:var(--pad);top:5.8rem;bottom:auto;transform:none;
+ width:min(340px,calc(100vw - 2rem));z-index:24;
+ align-items:stretch;flex-direction:column;gap:.55rem;
+}
+.tour-player__actions{width:100%;justify-content:flex-end}
+.tour-player__info{width:100%}
+.world-prompt{
+ display:inline-flex;align-items:center;justify-content:center;
+ max-width:190px;padding:.3rem .55rem;
+ font-size:10px;line-height:1.25;letter-spacing:.02em;
+ border-radius:6px;box-shadow:0 5px 14px rgba(5,36,90,.10);
+ pointer-events:none;
+}
+.map-toggle{
+ z-index:28;min-width:176px;
+ background:#05245A;color:#fff;border:2px solid #FE6202;
+ box-shadow:0 9px 24px rgba(5,36,90,.21);
+ font-weight:700;letter-spacing:.02em;
+}
+.map-toggle:hover,.map-toggle:focus-visible{
+ background:#FE6202;color:#fff;border-color:#05245A;
+}
+.world-map{
+ z-index:29;max-height:min(66vh,570px);overflow-y:auto;
+ border:1px solid #c6d4e7;
+}
+.world-map__heading{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:.7rem;padding:.55rem .7rem .2rem;
+ color:#05245A;font:700 .85rem Manrope,sans-serif;
+}
+.world-map__heading button{
+ width:32px;min-height:32px;min-width:32px;display:grid;place-items:center;
+ padding:0;border:1px solid #d6e2f0;border-radius:8px;
+ background:#fff;color:#05245A;font-size:1.1rem;cursor:pointer;
+}
+.world-map__hint{
+ padding:0 .7rem .5rem;color:#475569;
+ font:500 .71rem/1.45 Manrope,sans-serif;
+}
+.world-map button.world-map__tour{
+ display:block;width:100%;min-height:42px;margin:.25rem 0 .5rem;
+ padding:.75rem;background:#FE6202;color:#fff;border:0;border-radius:8px;
+ font:700 .74rem Manrope,sans-serif;text-align:center;cursor:pointer;
+}
+.world-map button.world-map__tour:hover{background:#05245A;color:#fff}
+.world-map button:not(.world-map__tour):not(.world-map__heading button){
+ cursor:pointer;
+}
+body.is-targeting canvas{cursor:pointer}
+@media(max-width:1100px){
+ .camera-controls{top:8.1rem}
+ .tour-player{top:8.1rem}
+}
+@media(max-width:780px){
+ .camera-controls{
+  left:.7rem;right:.7rem;top:auto;bottom:5.6rem;
+  width:auto;max-width:none;align-items:flex-start;
+ }
+ .camera-controls__modes,.camera-controls__actions{
+  width:auto;max-width:min(360px,100%);
+ }
+ .camera-controls__modes button{font-size:.63rem;padding:.4rem .5rem}
+ .camera-controls__actions button{font-size:.58rem;padding:.36rem .5rem}
+ .tour-player{
+  top:8.1rem;left:auto;right:.7rem;
+  width:min(300px,calc(100vw - 1.4rem));max-height:38vh;overflow-y:auto;
+ }
+ .world-map{right:.7rem;bottom:4.8rem}
+ .map-toggle{right:.7rem;bottom:.9rem;min-width:164px}
+}
+@media(max-width:530px){
+ .camera-controls{bottom:5rem}
+ .camera-controls__modes,.camera-controls__actions{max-width:100%}
+ .camera-controls__modes button{font-size:.57rem;padding:.3rem .39rem;min-height:32px}
+ .camera-controls__actions button{font-size:.56rem;padding:.28rem .38rem;min-height:30px}
+ .tour-player{top:7.4rem;right:.6rem;width:min(280px,calc(100vw - 1.2rem))}
+ .tour-player__info strong{font-size:.66rem}
+ .tour-player__info span,.tour-player__info em{font-size:.58rem}
+ .hud-top{z-index:33}
+ .map-toggle{min-width:154px}
+}
