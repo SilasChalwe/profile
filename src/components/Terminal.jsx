@@ -20,7 +20,7 @@ export default function Terminal({ position, rotation = [0,0,0], project, color,
     <mesh castShadow onPointerOver={event => {
       event.stopPropagation();
       setHovered(true);
-      onPreview?.(project.id);
+      if (!tourActive) onPreview?.(project.id);
       document.body.classList.add('is-targeting');
     }}
     onPointerOut={event => {
