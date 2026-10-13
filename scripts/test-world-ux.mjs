@@ -21,7 +21,7 @@ assert.match(world, /function Paths/, 'original walking paths must remain');
 assert.match(zone, /<Billboard follow lockX lockZ/, 'labels must face the player');
 assert.match(terminal, /<Billboard follow lockX lockZ/, 'project exhibits must face the player');
 assert.match(hud, /Explore areas/i, 'direct section navigation must be discoverable');
-assert.match(hud, /⌂ Start/, 'visitors need a visible return-to-start action');
+assert.match(hud, /⌂ Home/, 'visitors need a visible return-to-start action');
 assert.match(hud, /2 FINGERS/, 'first-time visitors need instructions');
 assert.match(hud, /Switch to standard portfolio view/, 'visitors need a non-game alternative');
 assert.match(app, /onHome=\{\(\) => travel\('plaza'\)\}/, 'home navigation must be connected');
