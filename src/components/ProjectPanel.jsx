@@ -1,3 +1,4 @@
+import MediaGallery from './MediaGallery.jsx';
 import React, { useEffect, useRef } from 'react';
 
 export default function ProjectPanel({ project, onClose }) {
@@ -7,7 +8,7 @@ export default function ProjectPanel({ project, onClose }) {
     <div className="project-panel">
       <button ref={closeRef} className="project-close" onClick={onClose}>Return to world <span>×</span></button>
       <header><p>{project.discipline} · {project.status}</p><h2 id="projectTitle">{project.title}</h2><h3>{project.strapline}</h3></header>
-      <div className="project-media-placeholder"><div><span>[ PROJECT MEDIA ]</span><strong>{project.media.label}</strong><p>No generated screenshot is substituted for authentic project evidence.</p></div></div>
+      <MediaGallery key={project.id} project={project} />
       <div className="project-story">
         <section><span>01 / PROBLEM</span><p>{project.problem}</p></section>
         <section><span>02 / MY ROLE</span><p>{project.role}</p><p>{project.contribution}</p></section>

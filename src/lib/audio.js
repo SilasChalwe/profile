@@ -1,141 +1,113 @@
+// Original, noise-based interface sound design. No tonal beep oscillators.
 export class PortfolioAudio {
-  constructor() {
-    this.context = null;
-    this.ambient = null;
-    this.ambientGain = null;
-    this.effectsEnabled = true;
-    this.ambientEnabled = false;
+  constructor(){
+    this.context=null;
+    this.ambientSource=null;
+    this.ambientGain=null;
+    this.effectsEnabled=true;
+    this.ambientEnabled=false;
+    this.lastHover=0;
   }
 
-  ensure() {
-    if (!this.context) this.context = new (window.AudioContext || window.webkitAudioContext)();
-    if (this.context.state === 'suspended') this.context.resume();
+  ensure(){
+    if(typeof window==='undefined')return null;
+    const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContextCtor)return null;
+    if(!this.context)this.context=new AudioContextCtor();
+    if(this.context.state==='suspended')this.context.resume().catch(()=>{});
     return this.context;
   }
 
-  // Soft, glassy tick for hover and minor interactions
-  tick() {
-    if (!this.effectsEnabled) return;
-    const context = this.ensure();
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-    const filter = context.createBiquadFilter();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, context.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1200, context.currentTime + 0.05);
-
-    filter.type = 'bandpass';
-    filter.frequency.value = 1000;
-
-    gain.gain.setValueAtTime(0, context.currentTime);
-    gain.gain.linearRampToValueAtTime(0.15, context.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.1);
-
-    osc.connect(filter).connect(gain).connect(context.destination);
-    osc.start();
-    osc.stop(context.currentTime + 0.1);
-  }
-
-  // Premium, polished click for selections
-  click() {
-    if (!this.effectsEnabled) return;
-    const context = this.ensure();
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(300, context.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(150, context.currentTime + 0.1);
-
-    gain.gain.setValueAtTime(0, context.currentTime);
-    gain.gain.linearRampToValueAtTime(0.2, context.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.15);
-
-    osc.connect(gain).connect(context.destination);
-    osc.start();
-    osc.stop(context.currentTime + 0.15);
-  }
-
-  // Soft transition/whoosh for panel opening
-  openPanel() {
-    if (!this.effectsEnabled) return;
-    const context = this.ensure();
-
-    // Noise burst
-    const bufferSize = context.sampleRate * 0.5; // 0.5 seconds
-    const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
+  noise(seconds=1){
+    const ctx=this.ensure();
+    if(!ctx)return null;
+    const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*seconds),ctx.sampleRate);
+    const data=buffer.getChannelData(0);
+    // A little correlated noise sounds more like cloth, air and mechanisms than a synth beep.
+    let previous=0;
+    for(let i=0;i<data.length;i++){
+      const white=Math.random()*2-1;
+      previous=(previous+white*.22)/1.18;
+      data[i]=previous*.6+white*.4;
     }
-
-    const noise = context.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = context.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(200, context.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(1500, context.currentTime + 0.2);
-    filter.frequency.exponentialRampToValueAtTime(200, context.currentTime + 0.4);
-
-    const gain = context.createGain();
-    gain.gain.setValueAtTime(0, context.currentTime);
-    gain.gain.linearRampToValueAtTime(0.1, context.currentTime + 0.1);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.4);
-
-    noise.connect(filter).connect(gain).connect(context.destination);
-    noise.start();
+    return buffer;
   }
 
-  setAmbient(enabled) {
-    this.ambientEnabled = enabled;
-    const context = this.ensure();
+  burst({duration=.16,cutoff=950,volume=.08,highpass=false,delay=0,rate=1}={}){
+    const ctx=this.ensure();
+    if(!ctx)return;
+    const source=ctx.createBufferSource();
+    source.buffer=this.noise(Math.max(duration*.95,.11));
+    source.playbackRate.value=rate;
+    const filter=ctx.createBiquadFilter();
+    filter.type=highpass?'highpass':'lowpass';
+    filter.frequency.value=cutoff;
+    const gain=ctx.createGain();
+    const at=ctx.currentTime+delay;
+    gain.gain.setValueAtTime(.00001,at);
+    gain.gain.exponentialRampToValueAtTime(Math.max(.0001,volume),at+Math.min(.018,duration*.15));
+    gain.gain.exponentialRampToValueAtTime(.00001,at+duration);
+    source.connect(filter).connect(gain).connect(ctx.destination);
+    source.start(at);
+    source.stop(at+duration+.01);
+    source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
+  }
 
-    if (enabled && !this.ambient) {
-      // Create a lush, premium ambient drone
-      const osc1 = context.createOscillator();
-      const osc2 = context.createOscillator();
-      const filter = context.createBiquadFilter();
-      const gain = context.createGain();
+  play(type='select'){
+    if(!this.effectsEnabled)return;
+    if(type==='hover'){
+      const time=Date.now();
+      if(time-this.lastHover<220)return;
+      this.lastHover=time;
+      this.burst({duration:.045,cutoff:1800,volume:.016,highpass:true});
+    }else if(type==='open'){
+      this.burst({duration:.38,cutoff:1600,volume:.052,highpass:true});
+      this.burst({duration:.085,cutoff:750,volume:.06,delay:.07});
+    }else if(type==='travel'){
+      this.burst({duration:.57,cutoff:1900,volume:.045,highpass:true});
+      this.burst({duration:.18,cutoff:320,volume:.035,delay:.21});
+    }else if(type==='close'){
+      this.burst({duration:.15,cutoff:800,volume:.043,highpass:true});
+    }else if(type==='enter'){
+      this.burst({duration:.67,cutoff:1500,volume:.05,highpass:true});
+      this.burst({duration:.15,cutoff:520,volume:.06,delay:.18});
+    }else{
+      this.burst({duration:.048,cutoff:2600,volume:.046,highpass:true});
+      this.burst({duration:.1,cutoff:620,volume:.043,delay:.012});
+    }
+  }
 
-      osc1.type = 'sine';
-      osc1.frequency.value = 55; // Low drone
+  // Maintain compatibility with the previous portfolio API.
+  click(){this.play('select');}
 
-      osc2.type = 'triangle';
-      osc2.frequency.value = 55.5; // Slight detune for warmth
-
-      filter.type = 'lowpass';
-      filter.frequency.value = 150;
-
-      // Slow fade in for ambient
-      gain.gain.setValueAtTime(0, context.currentTime);
-      gain.gain.linearRampToValueAtTime(0.03, context.currentTime + 2);
-
-      osc1.connect(filter);
-      osc2.connect(filter);
-      filter.connect(gain).connect(context.destination);
-
-      osc1.start();
-      osc2.start();
-
-      this.ambient = { osc1, osc2, gain };
-    } else if (!enabled && this.ambient) {
-      const { osc1, osc2, gain } = this.ambient;
-      // Fade out smoothly
-      gain.gain.setValueAtTime(gain.gain.value, context.currentTime);
-      gain.gain.linearRampToValueAtTime(0.001, context.currentTime + 1);
-
-      setTimeout(() => {
-        osc1.stop();
-        osc2.stop();
-        osc1.disconnect();
-        osc2.disconnect();
-      }, 1000);
-
-      this.ambient = null;
+  setAmbient(enabled){
+    this.ambientEnabled=!!enabled;
+    const ctx=this.ensure();
+    if(!ctx)return;
+    if(enabled&&!this.ambientSource){
+      const source=ctx.createBufferSource();
+      source.buffer=this.noise(3.2);
+      source.loop=true;
+      const filter=ctx.createBiquadFilter();
+      filter.type='lowpass';
+      filter.frequency.value=210;
+      const gain=ctx.createGain();
+      gain.gain.setValueAtTime(.00001,ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(.018,ctx.currentTime+1.3);
+      source.connect(filter).connect(gain).connect(ctx.destination);
+      source.start();
+      this.ambientSource=source;
+      this.ambientGain=gain;
+      this.ambientFilter=filter;
+    }else if(!enabled&&this.ambientSource){
+      const source=this.ambientSource;
+      const gain=this.ambientGain;
+      gain.gain.cancelScheduledValues(ctx.currentTime);
+      gain.gain.setTargetAtTime(.00001,ctx.currentTime,.16);
+      source.stop(ctx.currentTime+.75);
+      source.onended=()=>{source.disconnect();gain.disconnect();this.ambientFilter?.disconnect();};
+      this.ambientSource=null;this.ambientGain=null;
     }
   }
 }
-
-export const portfolioAudio = new PortfolioAudio();
+export const portfolioAudio=new PortfolioAudio();
