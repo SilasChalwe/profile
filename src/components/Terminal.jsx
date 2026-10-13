@@ -26,7 +26,7 @@ export default function Terminal({ position, rotation = [0,0,0], project, color 
       event.stopPropagation();setHovered(true);
       document.body.classList.add('is-targeting');portfolioAudio.play('hover');
     }} onPointerOut={()=>{setHovered(false);document.body.classList.remove('is-targeting')}} onClick={event=>{
-      event.stopPropagation();portfolioAudio.play('open');onOpen(project.id);
+      event.stopPropagation();onOpen(project.id);
     }}>
       <boxGeometry args={[3.25,2.6,.2]}/>
       <meshStandardMaterial color={active?ORANGE:NAVY} metalness={.16} roughness={.42} emissive={active?ORANGE:NAVY} emissiveIntensity={active?.12:0}/>
