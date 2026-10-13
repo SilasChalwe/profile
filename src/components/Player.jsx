@@ -2,6 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { readPose, readSession, saveSession } from '../lib/session.js';
+import { worldZones } from '../content.js';
+import { createTourStops, interpolateTourPose, tourTravelDuration, TOUR_VISIT_SECONDS } from '../lib/guided-tour.js';
+
+const TOUR_STOPS = createTourStops(worldZones);
 
 const EYE_HEIGHT = 2.2;
 const MAX_PITCH = Math.PI / 2 - .08;
@@ -27,7 +31,7 @@ function savedBirdView() {
 
 // Movement and looking are separate modes. Laptop touchpad two-finger scroll
 // sends wheel events; single-finger pointer/clicks never steer the camera.
-export default function Player({ paused, viewMode = 'move' }) {
+export default function Player({ paused, viewMode = 'move', tourStatus = 'idle', tourRunId = 0, onTourStep, onTourFinish }) {
   const { camera, gl } = useThree();
   const keys = useRef({});
   const initialPose = useRef(readPose());
@@ -43,6 +47,7 @@ export default function Player({ paused, viewMode = 'move' }) {
   const touchLook = useRef(null);
   const mouseLook = useRef(null);
   const lastSaved = useRef(0);
+  const tourRef = useRef(null);
 
   const persist = () => saveSession({
     pose: {
@@ -224,6 +229,83 @@ export default function Player({ paused, viewMode = 'move' }) {
         camera.position.copy(groundPosition.current);
       }
       currentMode.current = viewMode;
+    }
+
+    // Tour playback is authoritative over manual locomotion, but does not
+    // mutate the exhibition layout or hijack pointer interactions.
+    if (tourStatus === 'playing' || tourStatus === 'paused') {
+      if (!tourRef.current || tourRef.current.runId !== tourRunId) {
+        tourRef.current = { runId: tourRunId, target: 1, phase: 'travel', elapsed: 0 };
+        const initial = TOUR_STOPS[0];
+        camera.position.set(...initial.position);
+        camera.rotation.set(initial.pitch, initial.yaw, 0);
+        keys.current = {};
+        scrollMovement.current.set(0, 0, 0);
+        travel.current = null;
+        touchMove.current = { x: 0, y: 0 };
+        onTourStep?.({
+          id: TOUR_STOPS[1]?.id || 'plaza',
+          label: TOUR_STOPS[1]?.label || 'Central plaza',
+          phase: 'travelling', index: 1, total: TOUR_STOPS.length - 2
+        });
+      }
+      const run = tourRef.current;
+      if (tourStatus === 'playing' && !paused) {
+        const next = TOUR_STOPS[run.target];
+        const previous = TOUR_STOPS[run.target - 1];
+        if (next && previous) {
+          if (run.phase === 'travel') {
+            run.elapsed += Math.min(delta, .12);
+            const progress = Math.min(1, run.elapsed / tourTravelDuration(previous, next));
+            const pose = interpolateTourPose(previous, next, progress);
+            camera.position.set(...pose.position);
+            camera.rotation.set(pose.pitch, pose.yaw, 0);
+            if (progress >= 1) {
+              run.phase = 'visit';
+              run.elapsed = 0;
+              if (next.id === 'finish') {
+                tourRef.current = null;
+                onTourFinish?.();
+              } else {
+                onTourStep?.({
+                  id: next.id, label: next.label, phase: 'visiting',
+                  index: run.target, total: TOUR_STOPS.length - 2
+                });
+              }
+            }
+          } else {
+            run.elapsed += Math.min(delta, .12);
+            if (run.elapsed >= TOUR_VISIT_SECONDS) {
+              run.target += 1;
+              run.phase = 'travel';
+              run.elapsed = 0;
+              const upcoming = TOUR_STOPS[run.target];
+              onTourStep?.({
+                id: upcoming.id === 'finish' ? 'plaza' : upcoming.id,
+                label: upcoming.id === 'finish' ? 'Returning to central plaza' : upcoming.label,
+                phase: 'travelling',
+                index: Math.min(run.target, TOUR_STOPS.length - 2),
+                total: TOUR_STOPS.length - 2
+              });
+            }
+          }
+        }
+      }
+      // A stopped tour hands its current pose to manual movement.
+      groundPosition.current.copy(camera.position);
+      yaw.current = camera.rotation.y;
+      pitch.current = camera.rotation.x;
+      if (state.clock.elapsedTime - lastSaved.current > .7) {
+        persist();
+        lastSaved.current = state.clock.elapsedTime;
+      }
+      return;
+    }
+    if (tourRef.current !== null) {
+      tourRef.current = null;
+      groundPosition.current.copy(camera.position);
+      yaw.current = camera.rotation.y;
+      pitch.current = camera.rotation.x;
     }
 
     if (state.clock.elapsedTime - lastSaved.current > .7) {
