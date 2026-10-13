@@ -22,7 +22,7 @@ export default function App() {
     portfolio.projects.find(item => item.id === saved?.selectedProjectId) || null
   );
   const [activeZone, setActiveZone] = useState(() =>
-    worldZones.some(zone => zone.id === saved?.activeZone) ? saved.activeZone : worldZones[0].id
+    (saved?.activeZone === 'plaza' || worldZones.some(zone => zone.id === saved?.activeZone)) ? saved.activeZone : 'plaza'
   );
 
   // Browsers require a fresh user gesture to restart audio after navigation.
@@ -86,11 +86,15 @@ export default function App() {
   };
 
   const travel = zoneId => {
+    const isHome = zoneId === 'plaza';
     const zone = worldZones.find(item => item.id === zoneId);
-    if (!zone) return;
+    if (!isHome && !zone) return;
+    document.exitPointerLock?.();
     portfolioAudio.play('travel');
     setActiveZone(zoneId);
-    window.dispatchEvent(new CustomEvent('portfolio:travel', { detail: { position: zone.position } }));
+    window.dispatchEvent(new CustomEvent('portfolio:travel', {
+      detail: { position: isHome ? [0, 0, 0] : zone.position, home: isHome }
+    }));
     setPaused(false);
   };
 
@@ -130,6 +134,7 @@ export default function App() {
         setPaused={setPaused}
         activeZone={activeZone}
         onTravel={travel}
+        onHome={() => travel('plaza')}
         ambient={ambient}
         setAmbient={toggleAmbient}
         effects={effects}
