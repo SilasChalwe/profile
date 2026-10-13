@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { worldZones } from '../content.js';
+import { portfolioAudio } from '../lib/audio.js';
 
 function TouchControls() {
   const origin = useRef(null);
@@ -22,16 +23,16 @@ function TouchControls() {
 export default function HUD({ paused, setPaused, activeZone, onTravel, ambient, setAmbient, effects, setEffects, quality, setQuality, onAccessible }) {
   const [mapOpen, setMapOpen] = useState(false);
   return <div className="hud">
-    <header className="hud-top"><div className="hud-brand"><b>SC</b><span>INTERACTIVE PORTFOLIO</span></div><div className="hud-location"><i></i>{worldZones.find(zone=>zone.id===activeZone)?.label || 'Central plaza'}</div><button onClick={() => setPaused(true)} aria-label="Pause and open settings">II</button></header>
+    <header className="hud-top"><div className="hud-brand"><b>SC</b><span>INTERACTIVE PORTFOLIO</span></div><div className="hud-location"><i></i>{worldZones.find(zone=>zone.id===activeZone)?.label || 'Central plaza'}</div><button onClick={() => { portfolioAudio.play("select"); setPaused(true); }} aria-label="Pause and open settings">II</button></header>
     <div className="reticle" aria-hidden="true"><i></i><i></i></div>
     <div className="hud-help"><span>WASD / ARROWS</span><span>CLICK VIEW TO CAPTURE MOUSE</span><span>ESC / P TO PAUSE</span></div>
-    <button className="map-toggle" onClick={() => setMapOpen(value=>!value)} aria-expanded={mapOpen}>World map <span>{mapOpen?'×':'+'}</span></button>
+    <button className="map-toggle" onClick={() => { portfolioAudio.play("select"); setMapOpen(value=>!value); }} aria-expanded={mapOpen}>World map <span>{mapOpen?'×':'+'}</span></button>
     {mapOpen && <nav className="world-map" aria-label="Travel to exhibition zone">{worldZones.map((zone,index)=><button key={zone.id} className={zone.id===activeZone?'is-active':''} onClick={()=>{onTravel(zone.id);setMapOpen(false)}}><span>0{index+1}</span><i style={{background:zone.color}}></i>{zone.short}</button>)}</nav>}
     <TouchControls />
     {paused && <div className="pause-layer" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
       <div className="pause-panel"><p>WORLD PAUSED</p><h2 id="pauseTitle">Settings</h2>
-        <button className="resume" onClick={()=>setPaused(false)}>Resume exploration <span>→</span></button>
-        <label><span>Ambient audio<small>Original procedural soundscape</small></span><input type="checkbox" checked={ambient} onChange={event=>setAmbient(event.target.checked)} /></label>
+        <button className="resume" onClick={()=>{portfolioAudio.play("select");setPaused(false)}}>Resume exploration <span>→</span></button>
+        <label><span>Ambient audio<small>Soft environmental ambience</small></span><input type="checkbox" checked={ambient} onChange={event=>setAmbient(event.target.checked)} /></label>
         <label><span>Interaction sounds<small>Selection and transition cues</small></span><input type="checkbox" checked={effects} onChange={event=>setEffects(event.target.checked)} /></label>
         <label><span>Render quality<small>Lower quality improves mobile performance</small></span><select value={quality} onChange={event=>setQuality(event.target.value)}><option value="high">High</option><option value="low">Performance</option></select></label>
         <button className="accessible-link" onClick={onAccessible}>Switch to accessible portfolio view</button>
