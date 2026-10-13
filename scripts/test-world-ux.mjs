@@ -17,6 +17,14 @@ const css = read('src/styles.css');
 assert.match(world, /args=\{\['#ffffff'\]\}/, '3D background must be white-first');
 assert.match(world, /color="#ffffff"/, 'original world structures must use light materials');
 assert.match(world, /function CentralPlaza/, 'original central plaza must remain');
+assert.match(world, /function CentralPlaza\(\{ paused, reduceMotion \}\)/,
+  'central sculpture animation must respect pause and reduced motion');
+assert.match(world, /centerpiece\.current\.rotation\.y \+= dt \* \.17/,
+  'floating central sculpture must rotate continuously');
+assert.match(world, /if \(paused \|\| reduceMotion\) return/,
+  'the center must stop animating while paused or reduced motion is enabled');
+assert.match(world, /<Paths \/><CentralPlaza paused=\{paused\} reduceMotion=\{reduceMotion\} \/>/,
+  'the central floor and original walking paths must remain untouched');
 assert.match(world, /function Paths/, 'original walking paths must remain');
 assert.match(zone, /<Billboard follow lockX lockZ/, 'labels must face the player');
 assert.match(terminal, /<Billboard follow lockX lockZ/, 'project exhibits must face the player');
