@@ -34,13 +34,13 @@ export default function App() {
     setAmbient(withSound);
     if (withSound) portfolioAudio.setAmbient(true);
     portfolioAudio.effectsEnabled = effects;
-    portfolioAudio.click(300);
+    portfolioAudio.openPanel();
   };
 
   const openProject = projectId => {
     const project = portfolio.projects.find(item => item.id === projectId);
     if (!project) return;
-    portfolioAudio.click(520);
+    portfolioAudio.click();
     setSelectedProject(project);
     setPaused(true);
     document.exitPointerLock?.();
@@ -49,7 +49,7 @@ export default function App() {
   const travel = zoneId => {
     const zone = worldZones.find(item => item.id === zoneId);
     if (!zone) return;
-    portfolioAudio.click(350);
+    portfolioAudio.click();
     setActiveZone(zoneId);
     window.dispatchEvent(new CustomEvent('portfolio:travel', { detail: { position: zone.position } }));
     setPaused(false);
