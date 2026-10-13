@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function IntroScreen({ visible, onEnter, onAccessible }) {
+export default function IntroScreen({ visible, onEnter, onTour, onAccessible }) {
   const [sound, setSound] = useState(false);
   if (!visible) return null;
   return <main className="entry-screen">
@@ -13,6 +13,7 @@ export default function IntroScreen({ visible, onEnter, onAccessible }) {
       <p className="entry-copy__lede">Enter a navigable exhibition of systems, interfaces and engineering work.</p>
       <div className="entry-actions">
         <button className="primary-action" onClick={() => onEnter(sound)}>Enter world <span>→</span></button>
+        <button className="tour-entry-action" type="button" onClick={onTour}>▶ Start guided tour</button>
         <button className={`sound-choice ${sound ? 'is-on' : ''}`} onClick={() => setSound(value => !value)} aria-pressed={sound}>Ambient sound: {sound ? 'on' : 'off'}</button>
         <button className="text-button" onClick={onAccessible}>Open accessible portfolio</button>
       </div>
