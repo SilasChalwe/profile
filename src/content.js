@@ -280,7 +280,7 @@ portfolio.projects.push(
     contribution:'Designed sender access, quarantined messages, allow/block and message review interaction models.',
     details:['Allowed / quarantined sender states','Inbox and message-action interaction design','Privacy-focused local-processing concept','Design and architecture documents'],
     tech:['UI/UX','Product flows','Mobile UI','Figma'],link:'https://github.com/SilasChalwe',linkLabel:'View developer profile',
-    preview:'/assets/previews/gate.svg',previewType:'Design workflow illustration; not app screenshot',
+    preview:'/assets/previews/gate.svg',previewType:'Original Gate brand mark; interface screenshots pending',
     media:{placeholder:true,label:'Gate PDF screenshots awaiting approval'}
   },
   {
@@ -313,7 +313,7 @@ portfolio.projects.push(
     contribution:'An MFocus repository is available; screenshots and verified scope must be reviewed before publication.',
     details:['Source repository available','Product imagery pending','Public technical description pending'],
     tech:['Mobile UI','Product design'],link:'https://github.com/SilasChalwe/Mfocus',linkLabel:'View repository',
-    preview:'/assets/previews/mfocus.svg',previewType:'Placeholder design map',
+    preview:'/assets/previews/mfocus.svg',previewType:'Authentic MFocus launch-screen image with supplementary project illustration',
     media:{placeholder:true,label:'MFocus authentic app screenshots required'}
   },
   {
