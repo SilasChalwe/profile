@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { readPose, saveSession } from '../lib/session.js';
 
 const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
@@ -10,14 +11,34 @@ const right = new THREE.Vector3();
 export default function Player({ paused, onZone }) {
   const { camera, gl } = useThree();
   const keys = useRef({});
-  const yaw = useRef(0);
-  const pitch = useRef(-.08);
+  const startingPose = useRef(readPose());
+  const initialized = useRef(false);
+  const lastSavedAt = useRef(0);
+  const yaw = useRef(startingPose.current?.yaw ?? 0);
+  const pitch = useRef(startingPose.current?.pitch ?? -.08);
   const travel = useRef(null);
   const touch = useRef({ x: 0, y: 0 });
   const touchLook = useRef(null);
 
+  const persistPose = () => {
+    saveSession({
+      pose: {
+        position: [camera.position.x, 2.2, camera.position.z],
+        yaw: yaw.current,
+        pitch: pitch.current
+      }
+    });
+  };
+
   useEffect(() => {
     camera.rotation.order = 'YXZ';
+    if (!initialized.current) {
+      if (startingPose.current) {
+        camera.position.set(...startingPose.current.position);
+        camera.rotation.set(pitch.current, yaw.current, 0);
+      }
+      initialized.current = true;
+    }
     const down = event => { keys.current[event.code] = true; };
     const up = event => { keys.current[event.code] = false; };
     const look = event => {
@@ -40,22 +61,37 @@ export default function Player({ paused, onZone }) {
     const touchEnd = event => { if (touchLook.current?.id === event.pointerId) touchLook.current = null; };
     const travelHandler = event => { travel.current = new THREE.Vector3(event.detail.position[0], 2.2, event.detail.position[2] + 7); };
     const touchHandler = event => { touch.current = event.detail; };
+    const persistOnExit = () => {
+      saveSession({ pose: {
+        position: [camera.position.x, 2.2, camera.position.z],
+        yaw: yaw.current, pitch: pitch.current
+      } });
+    };
     window.addEventListener('keydown', down); window.addEventListener('keyup', up);
     document.addEventListener('mousemove', look); gl.domElement.addEventListener('click', click);
     gl.domElement.addEventListener('pointerdown', touchStart); gl.domElement.addEventListener('pointermove', touchMove); gl.domElement.addEventListener('pointerup', touchEnd);
     window.addEventListener('portfolio:travel', travelHandler);
     window.addEventListener('portfolio:move', touchHandler);
+    window.addEventListener('pagehide', persistOnExit);
     return () => {
       window.removeEventListener('keydown', down); window.removeEventListener('keyup', up);
       document.removeEventListener('mousemove', look); gl.domElement.removeEventListener('click', click);
       gl.domElement.removeEventListener('pointerdown', touchStart); gl.domElement.removeEventListener('pointermove', touchMove); gl.domElement.removeEventListener('pointerup', touchEnd);
       window.removeEventListener('portfolio:travel', travelHandler);
       window.removeEventListener('portfolio:move', touchHandler);
+      window.removeEventListener('pagehide', persistOnExit);
     };
   }, [camera, gl, paused]);
 
-  useFrame((_, delta) => {
-    if (paused) return;
+  useFrame((state, delta) => {
+    if (state.clock.elapsedTime - lastSavedAt.current > .5) {
+      persistPose();
+      lastSavedAt.current = state.clock.elapsedTime;
+    }
+    if (paused) {
+      keys.current = {};
+      return;
+    }
     if (travel.current) {
       camera.position.lerp(travel.current, Math.min(1, delta * 3.2));
       if (camera.position.distanceTo(travel.current) < .15) travel.current = null;
