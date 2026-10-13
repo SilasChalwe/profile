@@ -24,7 +24,7 @@ function CentralPlaza() {
   </group>;
 }
 
-export default function World({ paused, quality, reduceMotion, onProject, onZone, onPreview, onPreviewLeave }) {
+export default function World({ paused, quality, reduceMotion, viewMode, onProject, onZone, onPreview, onPreviewLeave }) {
   return <Suspense fallback={null}>
     <color attach="background" args={['#ffffff']} /><fog attach="fog" args={['#ffffff',48,118]} />
     <ambientLight intensity={1.15} /><hemisphereLight args={['#ffffff','#d9e3f0',1.05]} />
@@ -34,6 +34,6 @@ export default function World({ paused, quality, reduceMotion, onProject, onZone
     <Grid position={[0,-.335,0]} args={[82,82]} cellSize={1} cellThickness={.25} cellColor="#d5dfec" sectionSize={8} sectionThickness={.6} sectionColor="#9eb3ce" fadeDistance={78} fadeStrength={1.35} infiniteGrid />
     <Paths /><CentralPlaza />
     {worldZones.map(zone => <Zone key={zone.id} zone={zone} projects={portfolio.projects.filter(project => zone.projectIds.includes(project.id))} onProject={onProject} onActive={onZone} onPreview={onPreview} onPreviewLeave={onPreviewLeave} />)}
-    <Player paused={paused} onZone={onZone} />
+    <Player paused={paused} viewMode={viewMode} onZone={onZone} />
   </Suspense>;
 }
