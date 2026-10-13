@@ -292,3 +292,53 @@ html,body,#root{background:#ffffff;color:#05245A}
  .camera-controls__modes button{font-size:.59rem}
  .camera-controls__actions button{font-size:.55rem}
 }
+
+/* Optional cinematic tour controls — no changes to 3D scene geometry. */
+.tour-entry-action {
+ display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
+ min-height:46px;padding:.75rem 1.15rem;
+ border:1px solid #05245A;border-radius:8px;
+ background:#05245A;color:#fff;cursor:pointer;
+ font:700 .79rem Manrope,sans-serif;
+}
+.tour-entry-action:hover,.tour-entry-action:focus-visible{
+ background:#FE6202;border-color:#FE6202;
+}
+.tour-player{
+ position:absolute;left:50%;transform:translateX(-50%);
+ top:9.3rem;z-index:20;
+ width:min(540px,calc(100vw - 2rem));
+ display:flex;align-items:center;justify-content:space-between;gap:.85rem;
+ padding:.7rem .85rem;border:1px solid #c7d6e8;border-radius:12px;
+ background:rgba(255,255,255,.97);color:#05245A;
+ box-shadow:0 12px 35px rgba(5,36,90,.12);pointer-events:auto;
+}
+.tour-player__info{display:flex;flex-direction:column;gap:.18rem;min-width:0;flex:1}
+.tour-player__info strong{font:700 .77rem Manrope,sans-serif}
+.tour-player__info span{color:#475569;font:500 .7rem/1.35 Manrope,sans-serif;overflow-wrap:anywhere}
+.tour-player__info small{font:600 .63rem Manrope,sans-serif;color:#FE6202}
+.tour-player__actions{display:flex;gap:.35rem;flex-shrink:0;flex-wrap:wrap}
+.tour-player__actions button{
+ display:inline-flex;align-items:center;justify-content:center;min-height:36px;
+ padding:.43rem .68rem;background:#05245A;color:#fff;border:1px solid #05245A;
+ border-radius:8px;font:700 .69rem Manrope,sans-serif;cursor:pointer;
+}
+.tour-player__actions button:last-child:not(:first-child){background:#fff;color:#05245A;border-color:#c7d6e8}
+.tour-player__actions button:hover{background:#FE6202;color:#fff;border-color:#FE6202}
+@media(max-width:1050px){
+ .tour-player{top:11.5rem}
+ .hud-actions{gap:.28rem}
+ .hud-actions button{font-size:.63rem;padding:.44rem .5rem}
+}
+@media(max-width:700px){
+ .tour-player{top:10.7rem;padding:.55rem .6rem;gap:.45rem}
+ .tour-player__info strong{font-size:.7rem}
+ .tour-player__info span{font-size:.61rem}
+ .tour-player__actions button{font-size:.63rem;padding:.33rem .5rem;min-height:32px}
+ .hud-actions button{font-size:.55rem;padding:.36rem .4rem}
+}
+@media(max-width:420px){
+ .tour-player{top:11.4rem;flex-direction:column;align-items:stretch}
+ .tour-player__actions{justify-content:flex-end}
+ .hud-actions button{font-size:.52rem;padding:.32rem .3rem}
+}
