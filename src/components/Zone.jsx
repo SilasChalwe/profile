@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Float, Text, Billboard } from '@react-three/drei';
+import { Float, Text, Billboard, Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Terminal from './Terminal.jsx';
@@ -16,6 +16,8 @@ function ExhibitObject({ type, color }) {
     {type === 'design' && <><mesh rotation-y={.5}>{<boxGeometry args={[2.8,1.75,.08]} />}{material}</mesh><mesh position={[-.5,.3,.3]}>{<boxGeometry args={[1.25,2.1,.08]} />}{material}</mesh></>}
     {type === 'ai' && <><mesh>{<sphereGeometry args={[1.35,16,12]} />}{material}</mesh>{[0,1,2].map(i=><mesh key={i} rotation={[i*.7,i*.9,i*.3]}>{<torusGeometry args={[2+i*.2,.02,6,70]} />}{material}</mesh>)}</>}
     {type === 'embedded' && <><mesh>{<boxGeometry args={[2.6,.15,1.7]} />}{material}</mesh>{[-.9,0,.9].map((x,i)=><mesh key={x} position={[x,.65,(i-1)*.28]}>{<cylinderGeometry args={[.23,.23,1.2,12]} />}{material}</mesh>)}</>}
+    {!['software','mobile','design','ai','embedded','clients'].includes(type) &&
+      <mesh><dodecahedronGeometry args={[1.35,0]}/>{material}</mesh>}
     {type === 'clients' && <><mesh rotation-z={Math.PI/4}>{<octahedronGeometry args={[1.5]} />}{material}</mesh><mesh rotation-x={Math.PI/2}>{<torusGeometry args={[2.2,.03,6,80]} />}{material}</mesh></>}
   </group>;
 }
@@ -23,6 +25,9 @@ function ExhibitObject({ type, color }) {
 export default function Zone({ zone, projects, onProject, onActive, onPreview, onPreviewLeave }) {
   const { camera } = useThree();
   const [near, setNear] = useState(false);
+  const [page, setPage] = useState(0);
+  const maxPage = Math.max(0, Math.ceil(projects.length / 3) - 1);
+  const visibleProjects = projects.slice(page * 3, page * 3 + 3);
   const position = useMemo(() => new THREE.Vector3(...zone.position), [zone.position]);
   useFrame(() => {
     const distance = camera.position.distanceTo(position);
@@ -42,11 +47,18 @@ export default function Zone({ zone, projects, onProject, onActive, onPreview, o
     <ExhibitObject type={zone.id} color={zone.color} />
     <Billboard follow lockX lockZ position={[0,5.1,0]}><Text fontSize={.52} color="#05245A" anchorX="center" anchorY="middle">{zone.label.toUpperCase()}</Text></Billboard>
     <Billboard follow lockX lockZ position={[0,4.55,0]}><Text fontSize={.14} maxWidth={6.5} textAlign="center" color="#475569" anchorX="center">{zone.description}</Text></Billboard>
-    {projects.map((project, index) => {
-      const count = projects.length;
+    {visibleProjects.map((project, index) => {
+      const count = visibleProjects.length;
       const x = count === 1 ? 0 : (index - (count - 1) / 2) * 3.25;
       return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} onPreview={onPreview} onPreviewLeave={onPreviewLeave} />;
     })}
+    {maxPage > 0 && <Html center position={[0,.5,6]} distanceFactor={13}>
+      <div className="zone-pagination" aria-label={`${zone.label} project pages`}>
+        <button type="button" disabled={page===0} onClick={event=>{event.stopPropagation();setPage(p=>Math.max(0,p-1));}}>←</button>
+        <span>{page+1} / {maxPage+1}</span>
+        <button type="button" disabled={page===maxPage} onClick={event=>{event.stopPropagation();setPage(p=>Math.min(maxPage,p+1));}}>→</button>
+      </div>
+    </Html>}
     {!projects.length && <group position={[0,1.25,5]} rotation={[0,Math.PI,0]}>
       <mesh><boxGeometry args={[3.7,1.8,.2]} /><meshStandardMaterial color="#ffffff" roughness={.8} /></mesh>
       <Text position={[0,.25,.12]} fontSize={.2} color="#05245A">CURATED EXHIBIT</Text>
