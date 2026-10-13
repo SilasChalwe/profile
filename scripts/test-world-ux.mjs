@@ -58,4 +58,28 @@ for (const exhibition of worldZones) {
   assert.ok(Math.abs(towardExhibit[1] - cameraForward[1]) < 1e-10, exhibition.id + ' z facing');
   assert.ok(Math.abs(px) <= 34 && Math.abs(pz) <= 34, exhibition.id + ' must be inside map bounds');
 }
+
+assert.match(zone, /onTravel\?\.\(zone\.id\)/,
+  'clicking a zone title/platform should directly select the destination');
+assert.match(zone, /onClick=\{jumpToZone\}/,
+  'zone title and platform must be clickable');
+assert.match(world, /onTravel=\{onTravel\}/,
+  'direct zone travel must pass through 3D world component');
+assert.match(app, /onTravel=\{zoneId => travel\(zoneId\)\}/,
+  'zone selection must reach application navigation');
+assert.match(app, /instant: true/,
+  'zone selection and route navigation must request instant travel');
+assert.match(player, /if \(instant\)/,
+  'manual zone travel must jump immediately, not animate through the map');
+assert.match(hud, /Route \/ Zones/,
+  'route selection button must stay clearly labelled');
+assert.match(hud, /Play guided route/,
+  'guided route launch should be available inside the destination list');
+assert.match(css, /\.camera-controls\{\s*left:var\(--pad\)/,
+  'camera controls must not block the center of the world');
+assert.match(css, /\.tour-player\{\s*left:auto;right:var\(--pad\)/,
+  'tour player must not cover the center of the world');
+assert.match(terminal, /hovered && !tourActive/,
+  'oversized proximity popup must not appear during auto tour');
+
 console.log('3D scene structure, white palette, navigation and camera approach checks passed.');
