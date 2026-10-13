@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { worldZones } from '../src/content.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const world = read('src/components/World.jsx');
+const zone = read('src/components/Zone.jsx');
+const terminal = read('src/components/Terminal.jsx');
+const player = read('src/components/Player.jsx');
+const app = read('src/App.jsx');
+const hud = read('src/components/HUD.jsx');
+const css = read('src/styles.css');
+
+assert.match(world, /args=\{\['#f8fbff'\]\}/, '3D background must be white-first');
+assert.match(world, /color="#ffffff"/, 'original world structures must use light materials');
+assert.match(world, /function CentralPlaza/, 'original central plaza must remain');
+assert.match(world, /function Paths/, 'original walking paths must remain');
+assert.match(zone, /<Billboard follow lockX lockZ/, 'labels must face the player');
+assert.match(terminal, /<Billboard follow lockX lockZ/, 'project exhibits must face the player');
+assert.match(hud, /Explore Areas/, 'direct section navigation must be discoverable');
+assert.match(hud, /⌂ Start/, 'visitors need a visible return-to-start action');
+assert.match(hud, /How to explore/, 'first-time visitors need instructions');
+assert.match(hud, /Switch to standard, non-3D portfolio/, 'visitors need a non-game alternative');
+assert.match(app, /onHome=\{\(\) => travel\('plaza'\)\}/, 'home navigation must be connected');
+assert.match(player, /const startDrag/, 'drag look should not require pointer lock');
+assert.doesNotMatch(player, /requestPointerLock/, 'the cursor must remain freely usable');
+assert.match(css, /WHITE-WORLD AND ACCESSIBLE NAVIGATION/, 'white navigation theme is required');
+
+// When teleporting to a zone, spawn on its inward-facing side, looking at the exhibit.
+// This prevents the backwards text / rear-of-pavilion view that was reported.
+for (const exhibition of worldZones) {
+  const [x,,z] = exhibition.position;
+  const yaw = Math.atan2(-x,-z);
+  const px = x + Math.sin(yaw) * 8;
+  const pz = z + Math.cos(yaw) * 8;
+  const towardExhibit = [(x - px)/8, (z - pz)/8];
+  const cameraForward = [-Math.sin(yaw), -Math.cos(yaw)];
+  assert.ok(Math.abs(towardExhibit[0] - cameraForward[0]) < 1e-10, exhibition.id + ' x facing');
+  assert.ok(Math.abs(towardExhibit[1] - cameraForward[1]) < 1e-10, exhibition.id + ' z facing');
+  assert.ok(Math.abs(px) <= 34 && Math.abs(pz) <= 34, exhibition.id + ' must be inside map bounds');
+}
+console.log('3D scene structure, white palette, navigation and camera approach checks passed.');
