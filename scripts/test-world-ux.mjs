@@ -19,8 +19,12 @@ assert.match(world, /color="#ffffff"/, 'original world structures must use light
 assert.match(world, /function CentralPlaza/, 'original central plaza must remain');
 assert.match(world, /function CentralPlaza\(\{ paused, reduceMotion \}\)/,
   'central sculpture animation must respect pause and reduced motion');
-assert.match(world, /centerpiece\.current\.rotation\.y \+= dt \* \.17/,
-  'floating central sculpture must rotate continuously');
+assert.match(world, /centerpiece\.current\.rotation\.y \+= dt \* \.5/,
+  'entire central sculpture must rotate visibly');
+assert.match(world, /centerpiece\.current\.rotation\.x \+= dt \* \.11/,
+  'the entire sculpture should also tilt smoothly as it rotates');
+assert.doesNotMatch(world, /core\.current\.rotation/,
+  'the central diamond must not counter-rotate and appear stationary');
 assert.match(world, /if \(paused \|\| reduceMotion\) return/,
   'the center must stop animating while paused or reduced motion is enabled');
 assert.match(world, /<Paths \/><CentralPlaza paused=\{paused\} reduceMotion=\{reduceMotion\} \/>/,
