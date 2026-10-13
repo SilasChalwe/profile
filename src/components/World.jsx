@@ -1,5 +1,6 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { Grid } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import { portfolio, worldZones } from '../content.js';
 import Player from './Player.jsx';
 import Zone from './Zone.jsx';
@@ -15,12 +16,29 @@ function Paths() {
   })}</group>;
 }
 
-function CentralPlaza() {
+function CentralPlaza({ paused, reduceMotion }) {
+  const centerpiece = useRef(null);
+  const core = useRef(null);
+
+  useFrame((_, delta) => {
+    if (paused || reduceMotion) return;
+    const dt = Math.min(delta, .05);
+    // Animate the existing floating sculpture only: no moving floor or paths.
+    if (centerpiece.current) {
+      centerpiece.current.rotation.y += dt * .17;
+      centerpiece.current.rotation.x += dt * .065;
+      centerpiece.current.rotation.z += dt * .035;
+    }
+    if (core.current) core.current.rotation.y -= dt * .27;
+  });
+
   return <group>
     <mesh receiveShadow position={[0,-.15,0]}><cylinderGeometry args={[7,8,.3,12]} /><meshStandardMaterial color="#ffffff" metalness={.08} roughness={.65} /></mesh>
     <mesh position={[0,.01,0]} rotation-x={-Math.PI/2}><ringGeometry args={[5.2,5.27,72]} /><meshBasicMaterial color="#FE6202" transparent opacity={.55} /></mesh>
-    <mesh position={[0,2,0]}><octahedronGeometry args={[1.1]} /><meshStandardMaterial color="#05245A" emissive="#FE6202" emissiveIntensity={.12} wireframe /></mesh>
-    {[0,1,2].map(i => <mesh key={i} position={[0,2,0]} rotation={[i*.7,i*.55,i]}><torusGeometry args={[1.8+i*.32,.025,8,80]} /><meshBasicMaterial color={i===1?'#05245A':'#FE6202'} transparent opacity={.55} /></mesh>)}
+    <group ref={centerpiece} position={[0,2,0]}>
+      <mesh ref={core}><octahedronGeometry args={[1.1]} /><meshStandardMaterial color="#05245A" emissive="#FE6202" emissiveIntensity={.12} wireframe /></mesh>
+      {[0,1,2].map(i => <mesh key={i} rotation={[i*.7,i*.55,i]}><torusGeometry args={[1.8+i*.32,.025,8,80]} /><meshBasicMaterial color={i===1?'#05245A':'#FE6202'} transparent opacity={.55} /></mesh>)}
+    </group>
   </group>;
 }
 
@@ -32,7 +50,7 @@ export default function World({ paused, quality, reduceMotion, viewMode, tourSta
     <pointLight position={[0,6,0]} intensity={3} distance={24} color="#fff1e7" />
     <mesh position={[0,-.35,0]} rotation-x={-Math.PI/2} receiveShadow><planeGeometry args={[110,110]} /><meshStandardMaterial color="#ffffff" roughness={.92} /></mesh>
     <Grid position={[0,-.335,0]} args={[82,82]} cellSize={1} cellThickness={.25} cellColor="#d5dfec" sectionSize={8} sectionThickness={.6} sectionColor="#9eb3ce" fadeDistance={78} fadeStrength={1.35} infiniteGrid />
-    <Paths /><CentralPlaza />
+    <Paths /><CentralPlaza paused={paused} reduceMotion={reduceMotion} />
     {worldZones.map(zone => <Zone key={zone.id} zone={zone} projects={portfolio.projects.filter(project => zone.projectIds.includes(project.id))} onProject={onProject} onActive={onZone} onPreview={onPreview} onPreviewLeave={onPreviewLeave} onTravel={onTravel} tourActive={tourStatus === 'playing' || tourStatus === 'paused'} />)}
     <Player paused={paused} viewMode={viewMode} tourStatus={tourStatus} tourRunId={tourRunId} onTourStep={onTourStep} onTourFinish={onTourFinish} onZone={onZone} />
   </Suspense>;
