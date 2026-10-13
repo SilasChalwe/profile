@@ -95,3 +95,25 @@ for matching filenames.
 - `npm run check` validates project/zone references, gallery wiring,
   session behavior, and the production build.
 - All changes are developed on `port-v2`; do not modify `main`.
+
+## Camera views and touchpad controls
+
+The original 3D design has three view modes selectable above the world:
+
+| Mode | Two-finger laptop touchpad gesture | Other controls |
+| --- | --- | --- |
+| Move | Swipe vertically to walk, horizontally to strafe | WASD/arrow keys |
+| Look 360° | Swipe horizontally to turn behind or sideways; vertically to look up/down | Behind, Left, Right, Up, Down, Level; mouse right-drag; Q/E turn, R/F tilt |
+| Bird's-eye | Swipe to pan across the exhibition | Rotate, Zoom, Tilt 3D, Top-down; Q/E rotate, +/- zoom |
+
+A single-finger laptop touchpad movement always leaves the pointer free to
+select project terminals, carousel images, and UI buttons. There is no required
+double-tap or pointer lock. The bird camera can show a completely vertical
+overhead view or a tilted, isometric aerial perspective. Switching back to
+Move or Look returns the visitor to their ground-level position. The camera
+position/orientation, aerial zoom and tilt, and selected mode are saved across
+refreshes in the current tab.
+
+Run `npm run check` after camera changes. Test a full 180-degree turn, near
+vertical look up and down, bird's-eye pan/zoom/tilt, mode switching,
+one-finger project selection and laptop touchpad gestures in the browser.
