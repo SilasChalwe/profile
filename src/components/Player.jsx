@@ -250,6 +250,7 @@ export default function Player({ paused, viewMode = 'move', tourStatus = 'idle',
         });
       }
       const run = tourRef.current;
+      if (run.phase === 'finished') return;
       if (tourStatus === 'playing' && !paused) {
         const next = TOUR_STOPS[run.target];
         const previous = TOUR_STOPS[run.target - 1];
@@ -264,7 +265,9 @@ export default function Player({ paused, viewMode = 'move', tourStatus = 'idle',
               run.phase = 'visit';
               run.elapsed = 0;
               if (next.id === 'finish') {
-                tourRef.current = null;
+                // Keep this run marked complete until React acknowledges the
+                // state change; avoid accidentally restarting the tour.
+                run.phase = 'finished';
                 onTourFinish?.();
               } else {
                 onTourStep?.({
