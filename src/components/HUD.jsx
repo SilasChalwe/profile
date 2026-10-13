@@ -36,7 +36,6 @@ export default function HUD({
   const [helpOpen, setHelpOpen] = useState(false);
   const current = worldZones.find(zone => zone.id === activeZone);
   const goHome = () => {
-    portfolioAudio.play('travel');
     document.exitPointerLock?.();
     onHome();
     setAreasOpen(false);
