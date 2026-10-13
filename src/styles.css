@@ -295,3 +295,22 @@ html,body,#root{background:#f8fbff;color:#111827}
  grid-template-columns:none;padding:0;border:1px solid #bdcee1;
  background:#fff;color:#05245A;border-radius:8px;
 }
+
+/* Clear, conventional Back / Start actions */
+.hud-actions button:first-child{background:#fff;color:#05245A;border-color:#becde0}
+.hud-actions button:nth-child(2){background:#05245A;color:#fff;border-color:#05245A}
+.hud-actions button:disabled{
+ opacity:.48;cursor:not-allowed;box-shadow:none;
+}
+@media(max-width:700px){
+ .hud-actions button:nth-child(1),
+ .hud-actions button:nth-child(2),
+ .hud-actions button:nth-child(4),
+ .hud-actions button:nth-child(5){display:inline-flex}
+ .hud-actions button:nth-child(3){display:none}
+ .hud-actions button{padding:.37rem .42rem;min-height:34px;font-size:.6rem}
+}
+@media(max-width:380px){
+ .hud-actions button{font-size:.55rem;padding:.34rem .35rem}
+ .hud-top{padding:.7rem .6rem}
+}
