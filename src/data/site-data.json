@@ -92,7 +92,10 @@
         "media": {
           "placeholder": true,
           "label": "Prototype screens pending publication approval"
-        }
+        },
+        "sourcePdf": "AgroSpeak Connect — Farmer app prototype(1).pdf",
+        "mediaSource": "Original 32-page farmer app prototype supplied by owner",
+        "mediaPublication": "Approved for portfolio by owner in this conversation"
       },
       {
         "id": "campusnest",
@@ -312,7 +315,10 @@
         "media": {
           "placeholder": true,
           "label": "AIMZO 82-page prototype; public image approval pending"
-        }
+        },
+        "sourcePdf": "AIMZO (1).pdf",
+        "mediaSource": "Original 82-page product UI prototype supplied by owner",
+        "mediaPublication": "Approved for portfolio by owner in this conversation"
       },
       {
         "id": "bembaspeech",
