@@ -1,7 +1,7 @@
 import React from 'react';
 import { portfolio, worldZones } from '../content.js';
 
-const designVisuals = { "AgroSpeak / ASPECT": "/assets/previews/agrospeak.svg", "AIMZO": "/assets/previews/aimzo.svg", "Gate": "/assets/previews/gate.svg", "iSort": "/assets/previews/mfocus.svg", "Coded Master / client design": "/assets/previews/coded.svg" };
+const designVisuals = { "AgroSpeak / ASPECT": "/assets/previews/agrospeak.svg", "AIMZO": "/assets/previews/aimzo.svg", "Gate": "/assets/previews/gate.svg", "iSort": "/assets/previews/isort.svg", "Coded Master / client design": "/assets/previews/coded.svg" };
 
 export default function AccessiblePortfolio({ onWorld, onProject }) {
   return <main className="accessible" id="accessible-portfolio">
