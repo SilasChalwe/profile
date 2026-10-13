@@ -230,3 +230,20 @@ html,body,#root{background:#ffffff;color:#05245A}
 @media(prefers-reduced-motion:reduce){
  .world-project-preview,.project-gallery *{animation:none!important;transition:none!important}
 }
+
+/* Only appears when a zone contains more than three projects. */
+.zone-pagination{
+ display:flex;align-items:center;justify-content:center;gap:.65rem;
+ padding:.4rem .55rem;border-radius:99px;background:#fff;color:#05245A;
+ border:1px solid #c8d6e7;box-shadow:0 5px 18px rgba(5,36,90,.12);
+ font:600 .74rem Manrope,sans-serif;white-space:nowrap;
+}
+.zone-pagination button{
+ width:32px;height:32px;border-radius:50%;background:#05245A;color:#fff;
+ border:0;cursor:pointer;font-size:1rem;
+}
+.zone-pagination button:disabled{opacity:.35;cursor:not-allowed}
+.accessible-project-cover{
+ display:block;width:100%;max-height:240px;object-fit:contain;object-position:center;
+ margin:1rem 0;border:1px solid #dce5f0;border-radius:9px;background:#f8fbff;
+}
