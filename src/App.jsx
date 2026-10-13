@@ -171,7 +171,8 @@ export default function App() {
       detail: {
         position: isHome ? [0, 0, 0] : zone.position,
         home: isHome,
-        yaw: isHome ? 0 : Math.atan2(-zone.position[0], -zone.position[2])
+        yaw: isHome ? 0 : Math.atan2(-zone.position[0], -zone.position[2]),
+        instant: true
       }
     }));
     setPaused(false);
@@ -214,7 +215,7 @@ export default function App() {
         <World viewMode={viewMode} tourStatus={tour.status} tourRunId={tour.runId}
           onTourStep={onTourStep} onTourFinish={finishTour}
           paused={paused || !entered || accessible || Boolean(selectedProject)}
-          quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} onPreview={previewProject} onPreviewLeave={schedulePreviewClose} />
+          quality={quality} reduceMotion={reduceMotion} onProject={openProject} onZone={setActiveZone} onTravel={zoneId => travel(zoneId)} onPreview={previewProject} onPreviewLeave={schedulePreviewClose} />
         <AdaptiveDpr pixelated />
         <Preload all />
       </Canvas>
