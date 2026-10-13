@@ -251,14 +251,6 @@ export const worldZones = [
 // Visual experience enhancements — curated media and project exhibits
 // Preview files are accurately labelled *illustrations*, not screenshots.
 // Authentic project screenshots can replace them without changing the 3D components.
-const existingPreviews = {
-  fix:'fix',agrospeak:'agrospeak',campusnest:'campusnest',covian:'covian',cs301:'cs301'
-};
-for(const project of portfolio.projects){
-  project.preview = '/assets/previews/' + existingPreviews[project.id] + '.svg';
-  project.previewType = 'Engineering workflow illustration';
-}
-
 portfolio.projects.push(
   {
     id:'pulse',number:'06',title:'Pulse',strapline:'Android media discovery and streaming backed by an actively developed Node.js service.',
@@ -269,7 +261,6 @@ portfolio.projects.push(
     contribution:'Developed and tested Android features and investigated backend search, deployment and media-delivery behavior.',
     details:['Android application and backend integration','Search reliability and catalogue investigation','Streaming, device playback and download workflows','Release build and application testing'],
     tech:['Android','Node.js','REST APIs','Linux','Git'],link:'https://github.com/SilasChalwe',linkLabel:'View developer profile',
-    preview:'/assets/previews/pulse.svg',previewType:'Feature map; not an app screenshot',
     media:{placeholder:true,label:'Real Android screenshots awaiting approved export'}
   },
   {
@@ -291,7 +282,6 @@ portfolio.projects.push(
     contribution:'The supplied UI documentation includes customer discovery and booking, provider availability and earnings, and administrative dashboard flows. Final public attribution remains subject to clearance.',
     details:['Customer mobile browsing and reservations','Provider bookings, earnings and availability','Web admin dashboard and management views','Loading, verification and booking states'],
     tech:['UI/UX','Mobile design','Dashboard design','Prototyping'],link:'https://github.com/SilasChalwe',linkLabel:'View developer profile',
-    preview:'/assets/previews/aimzo.svg',previewType:'Workflow illustration based on provided design; not screenshot',
     media:{placeholder:true,label:'AIMZO 82-page prototype; public image approval pending'}
   },
   {
@@ -302,7 +292,6 @@ portfolio.projects.push(
     contribution:'Investigated and evaluated multilingual speech recognition with attention to Bemba/English decoding and data quality.',
     details:['Speech recognition experimentation','Model evaluation and error analysis','Low-resource language data','English and Bemba support investigation'],
     tech:['Python','Whisper','PyTorch','ASR'],link:'https://github.com/SilasChalwe/BembaSpeech',linkLabel:'View repository',
-    preview:'/assets/previews/bembaspeech.svg',previewType:'Research pipeline illustration',
     media:{placeholder:true,label:'Model evaluation charts pending'}
   },
   {
@@ -325,7 +314,6 @@ portfolio.projects.push(
     contribution:'Interface and client design work is awaiting public-safe project imagery and a validated case-study narrative.',
     details:['Client interface design','Design deliverables pending','Publication approval required'],
     tech:['Figma','UI/UX','Visual design'],link:'https://github.com/SilasChalwe',linkLabel:'View developer profile',
-    preview:'/assets/previews/coded.svg',previewType:'Placeholder for approved client work',
     media:{placeholder:true,label:'Approved Coded Master designs required'}
   },
   {
@@ -337,7 +325,6 @@ portfolio.projects.push(
     contribution:'Designed web interface work with Covian Navy, Hive Orange and responsive page structures.',
     details:['Responsive website design','Brand-consistent component styling','Corporate page layouts','Navigation and content presentation'],
     tech:['Web design','Responsive UI','JavaScript','CSS'],link:'https://covianhive.tech',linkLabel:'View live website',
-    preview:'/assets/previews/covianhive.svg',previewType:'Website layout illustration; not screenshot',
     media:{placeholder:true,label:'Approved real website captures to be added'}
   }
 );
@@ -348,6 +335,6 @@ const exhibitAssignments={
   clients:['coded','covianhive']
 };
 worldZones.forEach((zone,index)=>{
-  zone.color = index%2===0 ? '#05245A' : '#FE6202';
+  zone.color = '#FE6202';
   zone.projectIds.push(...(exhibitAssignments[zone.id]||[]));
 });
