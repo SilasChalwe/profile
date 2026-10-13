@@ -263,8 +263,7 @@ html,body,#root{background:#f8fbff;color:#111827}
  .hud-actions{grid-row:1;grid-column:2;flex-wrap:nowrap;gap:.3rem}
  .hud-actions button{min-height:36px;padding:.45rem .5rem;font-size:.64rem}
  .hud-actions button:nth-child(2){display:none}
- .hud-actions button:nth-child(3){display:none}
- .hud-actions button:nth-child(4){display:none}
+ .hud-actions button:nth-child(3),.hud-actions button:nth-child(4){display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:.4rem .46rem;font-size:.62rem;}
  .hud-help{bottom:1rem;left:1rem;max-width:calc(100vw - 220px);font-size:.64rem;padding:.55rem .65rem}
  .map-toggle{right:1rem;bottom:1rem;min-width:150px;font-size:.67rem}
  .world-map{right:1rem;bottom:4.7rem;max-height:62vh}
