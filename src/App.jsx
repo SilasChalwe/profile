@@ -93,7 +93,7 @@ export default function App() {
     if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
     previewLeaveTimer.current = setTimeout(() => {
       setPreviewProjectId(current => current === projectId ? null : current);
-    }, 550);
+    }, 3000);
   };
   useEffect(() => () => {
     if (previewLeaveTimer.current) clearTimeout(previewLeaveTimer.current);
