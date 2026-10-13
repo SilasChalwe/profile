@@ -33,7 +33,7 @@ export default function Terminal({ position, rotation = [0,0,0], project, color,
       event.stopPropagation();
       // On touchscreen the first tap shows the preview; an explicit button
       // inside the gallery opens the case study. Mouse click retains its action.
-      if (event.nativeEvent?.pointerType === 'touch') onPreview?.(project.id);
+      if ((event.sourceEvent?.pointerType || event.nativeEvent?.pointerType || event.pointerType) === 'touch') onPreview?.(project.id);
       else onOpen(project.id);
     }}>
       <boxGeometry args={[2.8, 2.1, .22]} />
