@@ -146,3 +146,87 @@ html,body,#root{background:#ffffff;color:#05245A}
  object-fit:contain;width:auto;height:auto;
 }
 .project-media-actual figcaption{padding:.8rem 0 0;color:#475569;font-size:.75rem;line-height:1.5}
+
+
+/* Data-driven screenshot previews: sits above the existing world, not a redesign. */
+.world-project-preview{
+ position:fixed;z-index:55;top:clamp(130px,22vh,250px);right:clamp(12px,3vw,45px);
+ width:clamp(255px,28vw,440px);max-width:calc(100vw - 24px);
+ background:#fff;border:1px solid #c5d4e8;border-radius:14px;
+ box-shadow:0 16px 55px rgba(5,36,90,.19);
+ color:#05245A;padding:12px;pointer-events:auto;
+}
+.world-project-preview__close{
+ position:absolute;z-index:2;right:7px;top:6px;width:32px;height:32px;
+ display:grid;place-items:center;border:1px solid #d6e2ef;border-radius:50%;
+ background:#fff;color:#05245A;cursor:pointer;font-size:1.25rem;
+}
+.project-gallery{
+ width:100%;min-width:0;display:flex;flex-direction:column;gap:.7rem;
+ background:#f4f8fd;border:1px solid #d3dfed;border-radius:12px;padding:clamp(.6rem,1vw,1rem);
+ color:#05245A;
+}
+.project-gallery__stage{min-height:0;display:flex;align-items:center;justify-content:center}
+.project-gallery__stage figure{width:100%;margin:0;text-align:center}
+.project-gallery__stage img{
+ display:block;max-width:100%;width:auto;max-height:48vh;height:auto;
+ object-fit:contain;margin:0 auto;border:1px solid #dbe5f0;border-radius:7px;
+ background:#fff;
+}
+.project-gallery__stage figcaption{
+ margin:.55rem .2rem 0;color:#475569;font-size:.73rem;line-height:1.4;
+}
+.project-gallery__pending{
+ min-height:155px;width:100%;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:.5rem;text-align:center;
+ padding:1.2rem;border:1px dashed #bccce0;border-radius:9px;
+}
+.project-gallery__pending strong{font-size:.92rem;color:#05245A}
+.project-gallery__pending p{font-size:.75rem;color:#475569;line-height:1.5}
+.project-gallery__controls{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:1rem;font-size:.78rem;font-weight:600;color:#05245A;
+}
+.project-gallery__controls button{
+ width:41px;height:35px;display:grid;place-items:center;border:1px solid #c6d5e7;
+ border-radius:8px;background:#fff;color:#05245A;cursor:pointer;font-size:1.05rem;
+}
+.project-gallery__controls button:hover{background:#05245A;color:#fff}
+.project-gallery__dots{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem}
+.project-gallery__dots button{
+ width:9px;height:9px;padding:0;border:0;border-radius:50%;
+ background:#b9c9de;cursor:pointer;
+}
+.project-gallery__dots button[aria-current="true"]{background:#FE6202;width:22px;border-radius:99px}
+.project-gallery__footer{
+ display:flex;align-items:center;justify-content:space-between;gap:1rem;
+ border-top:1px solid #d8e3f0;padding:.75rem .25rem .2rem;
+}
+.project-gallery__footer>div{min-width:0;display:flex;flex-direction:column;gap:.16rem}
+.project-gallery__footer strong{font-size:.92rem;color:#05245A;overflow-wrap:anywhere}
+.project-gallery__footer small{font-size:.64rem;color:#475569;line-height:1.3}
+.project-gallery__footer button{
+ flex-shrink:0;padding:.6rem .8rem;background:#FE6202;color:white;
+ border:0;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;
+}
+.project-gallery--detail{
+ width:min(100%,940px);margin:0 auto clamp(2rem,4vw,3rem);
+ padding:clamp(.85rem,2.2vw,1.5rem);
+}
+.project-gallery--detail .project-gallery__stage img{
+ max-height:clamp(240px,62vh,700px);
+}
+.project-gallery--detail .project-gallery__stage figcaption{font-size:.83rem}
+@media(max-width:820px){
+ .world-project-preview{
+  top:auto;bottom:75px;left:12px;right:12px;width:auto;
+  max-height:min(60vh,520px);overflow-y:auto;
+ }
+ .project-gallery--preview .project-gallery__stage img{max-height:31vh}
+ .project-gallery__footer strong{font-size:.83rem}
+ .project-gallery__footer small{font-size:.58rem}
+ .project-gallery__footer button{font-size:.7rem;padding:.54rem .65rem}
+}
+@media(prefers-reduced-motion:reduce){
+ .world-project-preview,.project-gallery *{animation:none!important;transition:none!important}
+}
