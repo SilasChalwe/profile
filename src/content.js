@@ -1,3 +1,5 @@
+import mediaManifest from './data/project-media.json';
+
 export const portfolio = {
   profile: {
     name: "Silas Chalwe",
@@ -18,6 +20,7 @@ export const portfolio = {
   projects: [
     {
       id: "fix",
+      zoneId: 'software',
       number: "01",
       title: "FIX",
       strapline: "A local-first media toolkit built around careful, recoverable processing.",
@@ -44,6 +47,7 @@ export const portfolio = {
     },
     {
       id: "agrospeak",
+      zoneId: 'mobile',
       number: "02",
       title: "AgroSpeak Connect",
       strapline: "A farmer-facing mobile foundation designed for accessible agricultural workflows.",
@@ -70,6 +74,7 @@ export const portfolio = {
     },
     {
       id: "campusnest",
+      zoneId: 'software',
       number: "03",
       title: "CampusNest",
       strapline: "A service-oriented backend for student accommodation workflows.",
@@ -96,6 +101,7 @@ export const portfolio = {
     },
     {
       id: "covian",
+      zoneId: 'software',
       number: "04",
       title: "Covian",
       strapline: "A security-first rendering boundary with a deterministic C++ core.",
@@ -122,6 +128,7 @@ export const portfolio = {
     },
     {
       id: "cs301",
+      zoneId: 'embedded',
       number: "05",
       title: "Hardware-backed data protection",
       strapline: "A physical-presence layer for encrypted file workflows.",
@@ -249,11 +256,10 @@ export const worldZones = [
 
 
 // Visual experience enhancements — curated media and project exhibits
-// Preview files are accurately labelled *illustrations*, not screenshots.
-// Authentic project screenshots can replace them without changing the 3D components.
 portfolio.projects.push(
   {
-    id:'pulse',number:'06',title:'Pulse',strapline:'Android media discovery and streaming backed by an actively developed Node.js service.',
+    id:'pulse',
+      zoneId: 'mobile',number:'06',title:'Pulse',strapline:'Android media discovery and streaming backed by an actively developed Node.js service.',
     category:['mobile','engineering'],discipline:'Android development · Backend services',
     status:'Working application · distribution in progress',statusTone:'progress',
     role:'Mobile development, API integration and backend debugging',
@@ -264,7 +270,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'Real Android screenshots awaiting approved export'}
   },
   {
-    id:'gate',number:'07',title:'Gate',strapline:'A sender-permission messaging experience built around clear inbox and quarantine decisions.',
+    id:'gate',
+      zoneId: 'design',number:'07',title:'Gate',strapline:'A sender-permission messaging experience built around clear inbox and quarantine decisions.',
     category:['design','mobile'],discipline:'Product design · Messaging UX',
     status:'UI/UX product study',statusTone:'progress',role:'Interface design and messaging workflow specification',
     problem:'Users need to make deliberate decisions about which senders can reach their primary inbox.',
@@ -275,7 +282,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'Gate PDF screenshots awaiting approval'}
   },
   {
-    id:'aimzo',number:'08',title:'AIMZO',strapline:'Connected mobile and web interfaces for booking, service management and administration.',
+    id:'aimzo',
+      zoneId: 'design',number:'08',title:'AIMZO',strapline:'Connected mobile and web interfaces for booking, service management and administration.',
     category:['design','mobile','clients'],discipline:'UI/UX design · Multi-sided service product',
     status:'Documented design prototype',statusTone:'progress',role:'Product interface design; client-specific attribution to confirm',
     problem:'Customers, service providers and administrators need distinct and consistent booking workflows.',
@@ -285,7 +293,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'AIMZO 82-page prototype; public image approval pending'}
   },
   {
-    id:'bembaspeech',number:'09',title:'BembaSpeech',strapline:'Practical experimentation with Bemba and English speech recognition.',
+    id:'bembaspeech',
+      zoneId: 'ai',number:'09',title:'BembaSpeech',strapline:'Practical experimentation with Bemba and English speech recognition.',
     category:['ai','engineering'],discipline:'Speech AI · Model experimentation',
     status:'Research and evaluation',statusTone:'progress',role:'Fine-tuning and speech-model evaluation',
     problem:'Low-resource language users have fewer robust speech-recognition options.',
@@ -295,7 +304,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'Model evaluation charts pending'}
   },
   {
-    id:'mfocus',number:'10',title:'MFocus',strapline:'Mobile application and product design work.',
+    id:'mfocus',
+      zoneId: 'mobile',number:'10',title:'MFocus',strapline:'Mobile application and product design work.',
     category:['mobile','design'],discipline:'Mobile application · UI/UX',
     status:'Project evidence being curated',statusTone:'progress',role:'Application work; exact contributions to be documented',
     problem:'Full product brief and user problem statement to be supplied.',
@@ -306,7 +316,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'MFocus authentic app screenshots required'}
   },
   {
-    id:'coded',number:'11',title:'Coded Master',strapline:'Client-facing interface and product design work.',
+    id:'coded',
+      zoneId: 'clients',number:'11',title:'Coded Master',strapline:'Client-facing interface and product design work.',
     category:['design','clients'],discipline:'Client work · UI/UX design',
     status:'Client presentation pending clearance',statusTone:'progress',
     role:'UI design work reported by creator; exact deliverables pending',
@@ -317,7 +328,8 @@ portfolio.projects.push(
     media:{placeholder:true,label:'Approved Coded Master designs required'}
   },
   {
-    id:'covianhive',number:'12',title:'CovianHive.tech',strapline:'A real corporate website with a restrained, white-first brand system.',
+    id:'covianhive',
+      zoneId: 'clients',number:'12',title:'CovianHive.tech',strapline:'A real corporate website with a restrained, white-first brand system.',
     category:['design','clients','engineering'],discipline:'Website design · Frontend engineering',
     status:'Website design and implementation',statusTone:'verified',
     role:'Web interface and visual presentation design',
@@ -328,13 +340,23 @@ portfolio.projects.push(
     media:{placeholder:true,label:'Approved real website captures to be added'}
   }
 );
-const exhibitAssignments={
-  mobile:['pulse','mfocus'],
-  design:['gate','aimzo'],
-  ai:['bembaspeech'],
-  clients:['coded','covianhive']
-};
-worldZones.forEach((zone,index)=>{
-  zone.color = '#FE6202';
-  zone.projectIds.push(...(exhibitAssignments[zone.id]||[]));
-});
+
+// Media and exhibition membership are derived from the project data and asset manifest.
+// Add a project with a zoneId; add approved screenshots to public/projects/<id>/;
+// run npm run media:sync. No 3D scene code needs editing.
+export const getProjectMedia = project => (
+  mediaManifest[typeof project === 'string' ? project : project.id] || []
+);
+for (const project of portfolio.projects) {
+  project.previewImages = getProjectMedia(project);
+  project.coverImage = project.previewImages[0]?.src || null;
+  // Retain legacy 'preview' only as a fallback when no screenshots are published.
+}
+for (const zone of worldZones) {
+  zone.projectIds = portfolio.projects
+    .filter(project => project.zoneId === zone.id && project.published !== false)
+    .map(project => project.id);
+}
+export const projectsForZone = zoneId => portfolio.projects.filter(
+  project => project.zoneId === zoneId && project.published !== false
+);
