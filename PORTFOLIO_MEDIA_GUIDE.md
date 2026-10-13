@@ -117,3 +117,29 @@ refreshes in the current tab.
 Run `npm run check` after camera changes. Test a full 180-degree turn, near
 vertical look up and down, bird's-eye pan/zoom/tilt, mode switching,
 one-finger project selection and laptop touchpad gestures in the browser.
+
+
+## Automatic guided tour (cinematic walkthrough)
+
+The portfolio includes an optional automatic **Start guided tour** on the entry
+screen and **Start tour** in the in-world navigation. It does not replace
+manual WASD/touchpad navigation or the **Home** button.
+
+The tour uses the actual `worldZones` data from
+`src/data/site-data.json`. It travels from the central plaza to every
+published exhibition area, pauses for about 4.5 seconds per area so visitors
+can inspect the work, and returns to the plaza. No scene geometry or layout is
+changed. Smooth camera movement and camera heading interpolation are defined
+in `src/lib/guided-tour.js`.
+
+The player supports **Pause**, **Resume**, **Stop** and **Replay**.
+Clicking a project or choosing a destination stops automatic movement
+and returns manual control. Choosing a different camera perspective also stops
+the tour. Playback is deliberately not restarted automatically after refresh,
+but ordinary manual exploration state still restores as before.
+
+To change tour pacing, edit `TOUR_SPEED` and `TOUR_VISIT_SECONDS`
+in `src/lib/guided-tour.js`. Adding a new zone automatically adds it to
+the route without editing camera code. To verify route and player wiring,
+run `npm run check` and then confirm the actual camera motion in Chrome
+on both laptop touchpad and touch-screen devices.
