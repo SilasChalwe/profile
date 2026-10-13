@@ -20,7 +20,7 @@ function ExhibitObject({ type, color }) {
   </group>;
 }
 
-export default function Zone({ zone, projects, onProject, onActive }) {
+export default function Zone({ zone, projects, onProject, onActive, onPreview, onPreviewLeave }) {
   const { camera } = useThree();
   const [near, setNear] = useState(false);
   const position = useMemo(() => new THREE.Vector3(...zone.position), [zone.position]);
@@ -45,7 +45,7 @@ export default function Zone({ zone, projects, onProject, onActive }) {
     {projects.map((project, index) => {
       const count = projects.length;
       const x = count === 1 ? 0 : (index - (count - 1) / 2) * 3.25;
-      return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} />;
+      return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} onPreview={onPreview} onPreviewLeave={onPreviewLeave} />;
     })}
     {!projects.length && <group position={[0,1.25,5]} rotation={[0,Math.PI,0]}>
       <mesh><boxGeometry args={[3.7,1.8,.2]} /><meshStandardMaterial color="#ffffff" roughness={.8} /></mesh>
