@@ -18,25 +18,22 @@ function Paths() {
 
 function CentralPlaza({ paused, reduceMotion }) {
   const centerpiece = useRef(null);
-  const core = useRef(null);
 
   useFrame((_, delta) => {
-    if (paused || reduceMotion) return;
+    if (paused || reduceMotion || !centerpiece.current) return;
     const dt = Math.min(delta, .05);
-    // Animate the existing floating sculpture only: no moving floor or paths.
-    if (centerpiece.current) {
-      centerpiece.current.rotation.y += dt * .17;
-      centerpiece.current.rotation.x += dt * .065;
-      centerpiece.current.rotation.z += dt * .035;
-    }
-    if (core.current) core.current.rotation.y -= dt * .27;
+    // Rotate the WHOLE existing sculpture as one rigid assembly.
+    // The diamond stays aligned with the surrounding orbital rings.
+    centerpiece.current.rotation.y += dt * .5;
+    centerpiece.current.rotation.x += dt * .11;
+    centerpiece.current.rotation.z += dt * .045;
   });
 
   return <group>
     <mesh receiveShadow position={[0,-.15,0]}><cylinderGeometry args={[7,8,.3,12]} /><meshStandardMaterial color="#ffffff" metalness={.08} roughness={.65} /></mesh>
     <mesh position={[0,.01,0]} rotation-x={-Math.PI/2}><ringGeometry args={[5.2,5.27,72]} /><meshBasicMaterial color="#FE6202" transparent opacity={.55} /></mesh>
     <group ref={centerpiece} position={[0,2,0]}>
-      <mesh ref={core}><octahedronGeometry args={[1.1]} /><meshStandardMaterial color="#05245A" emissive="#FE6202" emissiveIntensity={.12} wireframe /></mesh>
+      <mesh><octahedronGeometry args={[1.1]} /><meshStandardMaterial color="#05245A" emissive="#FE6202" emissiveIntensity={.12} wireframe /></mesh>
       {[0,1,2].map(i => <mesh key={i} rotation={[i*.7,i*.55,i]}><torusGeometry args={[1.8+i*.32,.025,8,80]} /><meshBasicMaterial color={i===1?'#05245A':'#FE6202'} transparent opacity={.55} /></mesh>)}
     </group>
   </group>;
