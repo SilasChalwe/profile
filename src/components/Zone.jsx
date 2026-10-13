@@ -9,7 +9,7 @@ function ExhibitObject({ type, color }) {
   useFrame((state, delta) => {
     if (group.current) group.current.rotation.y += delta * .15;
   });
-  const material = <meshStandardMaterial color="#05245A" emissive={color} emissiveIntensity={.065} metalness={.3} roughness={.5} wireframe />;
+  const material = <meshStandardMaterial color="#05245A" emissive={color} emissiveIntensity={.06} metalness={.3} roughness={.55} wireframe />;
   return <group ref={group} position={[0, 2.6, 0]}>
     {type === 'software' && <><mesh>{<icosahedronGeometry args={[1.45,1]} />}{material}</mesh><mesh rotation-x={Math.PI/2}>{<torusGeometry args={[2.2,.035,8,80]} />}{material}</mesh></>}
     {type === 'mobile' && <Float speed={1.4} floatIntensity={.25}><mesh rotation-z={-.13}>{<boxGeometry args={[1.7,3.2,.28]} />}{material}</mesh></Float>}
@@ -33,26 +33,22 @@ export default function Zone({ zone, projects, onProject, onActive }) {
   return <group position={zone.position} rotation={[0,inwardRotation,0]}>
     <mesh receiveShadow position={[0,-.18,0]}>
       <cylinderGeometry args={[7.3,8, .36, 8]} />
-      <meshStandardMaterial color={near ? '#fff7f0' : '#ffffff'} metalness={.06} roughness={.78} />
+      <meshStandardMaterial color={near ? '#fff3e9' : '#ffffff'} roughness={.8} metalness={.07} />
     </mesh>
     <mesh position={[0,.02,0]} rotation-x={-Math.PI/2}>
       <ringGeometry args={[6.1,6.18,64]} />
       <meshBasicMaterial color={zone.color} transparent opacity={near ? .9 : .35} />
     </mesh>
     <ExhibitObject type={zone.id} color={zone.color} />
-    <Billboard follow lockX lockZ position={[0,5.1,0]}>
-      <Text fontSize={.52} color="#05245A" outlineWidth={.004} outlineColor="#ffffff" anchorX="center" anchorY="middle">{zone.label.toUpperCase()}</Text>
-    </Billboard>
-    <Billboard follow lockX lockZ position={[0,4.55,0]}>
-      <Text fontSize={.14} maxWidth={6.5} textAlign="center" color="#475569" anchorX="center">{zone.description}</Text>
-    </Billboard>
+    <Billboard follow lockX lockZ position={[0,5.1,0]}><Text fontSize={.52} color="#05245A" anchorX="center" anchorY="middle">{zone.label.toUpperCase()}</Text></Billboard>
+    <Billboard follow lockX lockZ position={[0,4.55,0]}><Text fontSize={.14} maxWidth={6.5} textAlign="center" color="#475569" anchorX="center">{zone.description}</Text></Billboard>
     {projects.map((project, index) => {
       const count = projects.length;
       const x = count === 1 ? 0 : (index - (count - 1) / 2) * 3.25;
       return <Terminal key={project.id} position={[x,1.35,5]} project={project} color={zone.color} onOpen={onProject} />;
     })}
     {!projects.length && <group position={[0,1.25,5]} rotation={[0,Math.PI,0]}>
-      <mesh><boxGeometry args={[3.7,1.8,.2]} /><meshStandardMaterial color="#ffffff" metalness={.1} roughness={.7} /></mesh>
+      <mesh><boxGeometry args={[3.7,1.8,.2]} /><meshStandardMaterial color="#ffffff" roughness={.8} /></mesh>
       <Text position={[0,.25,.12]} fontSize={.2} color="#05245A">CURATED EXHIBIT</Text>
       <Text position={[0,-.2,.12]} fontSize={.11} color="#475569" maxWidth={3} textAlign="center">Approved project media and detailed evidence pending</Text>
     </group>}
